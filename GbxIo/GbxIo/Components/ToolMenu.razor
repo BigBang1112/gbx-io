@@ -1,0 +1,17 @@
+﻿@using GbxIo.Client.Tools
+
+@inject NavigationManager NavManager
+@inject IEnumerable<IoTool> Tools
+
+<div class="tool-menu">
+    @foreach (var tool in Tools)
+    {
+        <NavLink href="@tool.Endpoint" class="reu-button">@tool.Name</NavLink>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public bool Highlight { get; set; }
+}

@@ -1,9 +1,0 @@
-﻿@page "/{tool:nonfile?}"
-@rendermode InteractiveWebAssembly
-
-<GbxIoComponent Tool="@Tool"></GbxIoComponent>
-
-@code {
-    [Parameter]
-    public string? Tool { get; set; }
-}
