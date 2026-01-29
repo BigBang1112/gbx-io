@@ -27,6 +27,10 @@ public sealed class ExtractGhostsIoTool(string endpoint, IServiceProvider provid
                     .Concat(challenge.Node.ClipGroupInGame?.Clips.SelectMany(x => x.Clip.GetGhosts()) ?? [])
                     .Concat(challenge.Node.ClipGroupEndRace?.Clips.SelectMany(x => x.Clip.GetGhosts()) ?? [])
                     .Concat(challenge.Node.ClipAmbiance?.GetGhosts() ?? []);
+                if (challenge.Node.ChallengeParameters?.RaceValidateGhost is not null)
+                {
+                    ghosts = ghosts.Append(challenge.Node.ChallengeParameters.RaceValidateGhost);
+                }
                 break;
             default:
                 throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Challenge/Map.Gbx is supported.");
