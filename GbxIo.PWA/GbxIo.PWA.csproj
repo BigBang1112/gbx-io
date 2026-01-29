@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
@@ -15,10 +15,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.10" PrivateAssets="all" />
-        <PackageReference Include="NativeSharpLzo" Version="0.3.3" />
-        <PackageReference Include="NativeSharpZlib" Version="0.2.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" PrivateAssets="all" />
+        <PackageReference Include="NativeSharpLzo" Version="0.3.5" />
+        <PackageReference Include="NativeSharpZlib" Version="0.2.9" />
     </ItemGroup>
 
     <ItemGroup>
