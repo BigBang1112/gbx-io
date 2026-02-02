@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+@inject NavigationManager NavManager
+@inject IEnumerable<IoTool> Tools
+
+<div class="tool-menu">
+    @foreach (var tool in Tools)
+    {
+        <ReuButton Href="@tool.Endpoint" NavLink="true">@tool.Name</ReuButton>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public bool Highlight { get; set; }
+}

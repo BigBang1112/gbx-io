@@ -1,0 +1,32 @@
+﻿@inject ToolService ToolService
+
+<PageTitle>Home</PageTitle>
+
+<ReuUploadScreen></ReuUploadScreen>
+<ReuMain>
+    <div class="io-main">
+        <ToolMenu></ToolMenu>
+        <div class="io-upload-area">
+            <ReuUploadButton>Upload via this button</ReuUploadButton>
+        </div>
+    </div>
+</ReuMain>
+
+@code {
+    [Parameter, EditorRequired]
+    public string? Tool { get; set; }
+
+    string GetTitle()
+    {
+        var title = "Gbx I/O";
+        var toolName = string.IsNullOrEmpty(Tool)
+            ? null : ToolService.GetTool(Tool)?.Name;
+
+        if (toolName is not null)
+        {
+            title += $" - {toolName}";
+        }
+
+        return title;
+    }
+}

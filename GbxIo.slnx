@@ -1,4 +1,7 @@
 <Solution>
-  <Project Path="GbxIo/GbxIo.Client/GbxIo.Client.csproj" Id="c77e7693-72de-4950-8ad7-52edf005c6db" />
-  <Project Path="GbxIo/GbxIo/GbxIo.csproj" Id="f5201281-ec33-4a96-ba56-ebecb5ec43e0" />
+  <Project Path="GbxIo/GbxIo.BlazorWasm/GbxIo.BlazorWasm.csproj" Id="2cd692f0-1b55-4f12-aecd-f0c8ae130c73" />
+  <Project Path="GbxIo/GbxIo.BlazorWebApp/GbxIo.BlazorWebApp.Client/GbxIo.BlazorWebApp.Client.csproj" Id="61e618ab-9b44-4303-a43d-4b7aa1aeaea8" />
+  <Project Path="GbxIo/GbxIo.BlazorWebApp/GbxIo.BlazorWebApp/GbxIo.BlazorWebApp.csproj" Id="21f5d82e-fcc6-4ac8-b054-a91967df8c0c" />
+  <Project Path="GbxIo/GbxIo.Photino/GbxIo.Photino.csproj" Id="b2c6d3fd-beb3-45ff-8800-1bda8678aa25" />
+  <Project Path="GbxIo/GbxIo/GbxIo.csproj" Id="587cbb2c-98ec-4124-b9eb-a02e070edb5d" />
 </Solution>
