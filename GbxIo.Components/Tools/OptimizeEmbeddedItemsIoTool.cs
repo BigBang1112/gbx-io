@@ -2,7 +2,6 @@
 using GBX.NET;
 using ByteSizeLib;
 using SharpCompress.Archives.Zip;
-using SharpCompress.Compressors.Deflate;
 
 namespace GbxIo.Components.Tools;
 
@@ -19,32 +18,36 @@ public sealed class OptimizeEmbeddedItemsIoTool(string endpoint, IServiceProvide
         }
 
         using var inputStream = new MemoryStream(input.Node.EmbeddedZipData);
-        using var inputZip = ZipArchive.Open(inputStream);
+        await using var inputZip = await ZipArchive.OpenAsyncArchive(inputStream, cancellationToken: cancellationToken);
 
         using var outputStream = new MemoryStream();
 
-        using (var zipArchive = ZipArchive.Create())
+        await using (var zipArchive = await ZipArchive.CreateAsyncArchive())
         {
-            zipArchive.DeflateCompressionLevel = CompressionLevel.BestCompression;
-
-            foreach (var entry in inputZip.Entries)
+            await foreach (var entry in inputZip.EntriesAsync)
             {
                 var ms = new MemoryStream();
-                using var entryStream = entry.OpenEntryStream();
+                await using var entryStream = await entry.OpenEntryStreamAsync(cancellationToken);
 
                 if (entry.Key?.EndsWith(".gbx", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    Gbx.Decompress(input: entryStream, output: ms);
+                    using var inputMs = new MemoryStream();
+                    await entryStream.CopyToAsync(inputMs, cancellationToken); // due to a few bugs in GBX.NET
+                    inputMs.Position = 0;
+                    await Gbx.DecompressAsync(input: inputMs, output: ms, cancellationToken: cancellationToken);
                 }
                 else
                 {
-                    entryStream.CopyTo(ms);
+                    await entryStream.CopyToAsync(ms, cancellationToken);
                 }
 
-                var zipEntry = zipArchive.AddEntry(entry.Key!, ms, true);
+                var zipEntry = await zipArchive.AddEntryAsync(entry.Key!, ms, true, cancellationToken: cancellationToken);
             }
 
-            zipArchive.SaveTo(outputStream);
+            await zipArchive.SaveToAsync(outputStream, new(SharpCompress.Common.CompressionType.Deflate)
+            {
+                CompressionLevel = 9
+            }, cancellationToken: cancellationToken);
         }
 
         var optimizedByteCount = input.Node.EmbeddedZipData.Length - outputStream.Length;
