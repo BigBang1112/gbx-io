@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GbxIo.Components/GbxIo.Components.csproj" />
+  <Project Path="GbxIo.PWA/GbxIo.PWA.csproj" />
+  <Project Path="GbxIo/GbxIo.Client/GbxIo.Client.csproj" />
+  <Project Path="GbxIo/GbxIo/GbxIo.csproj" />
+</Solution>

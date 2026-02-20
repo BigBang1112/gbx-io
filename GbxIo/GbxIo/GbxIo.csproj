@@ -13,8 +13,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\GbxIo.Components\GbxIo.Components.csproj" />
         <ProjectReference Include="..\GbxIo.Client\GbxIo.Client.csproj" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.2" />
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     </ItemGroup>
 
     <ItemGroup>
