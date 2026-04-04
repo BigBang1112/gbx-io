@@ -57,7 +57,7 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
 
     private static IEnumerable<IEnumerable<IInput>> GetGhostInputs(CGameCtnGhost ghost)
     {
-        IEnumerable<IEnumerable<IInput>> ghostInputs = [ghost.Inputs ?? []];
+        IEnumerable<IEnumerable<IInput>> ghostInputs = [ghost.Inputs];
 
         if (ghost.PlayerInputs is not null)
         {
