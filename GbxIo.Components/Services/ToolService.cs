@@ -144,7 +144,7 @@ public sealed class ToolService
                 }
 
                 var entryMagicData = new byte[4];
-                await entryStream.ReadAsync(entryMagicData, cancellationToken);
+                await entryStream.ReadExactlyAsync(entryMagicData, cancellationToken);
 
                 if (entryMagicData[0] != 'G' || entryMagicData[1] != 'B' || entryMagicData[2] != 'X')
                 {
