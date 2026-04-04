@@ -21,13 +21,13 @@ public sealed class GbxService
         Gbx.ZLib = new ZLib();
     }
 
-    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly)
+    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly, bool ignoreExceptionsInBody)
     {
         try
         {
             return headerOnly
                 ? Gbx.ParseHeader(stream, new() { Logger = logger })
-                : await Gbx.ParseAsync(stream, new() { Logger = logger });
+                : await Gbx.ParseAsync(stream, new() { Logger = logger, IgnoreExceptionsInBody = ignoreExceptionsInBody });
         }
         catch (NotAGbxException)
         {

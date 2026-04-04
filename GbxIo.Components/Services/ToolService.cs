@@ -49,11 +49,14 @@ public sealed class ToolService
         var inputType = genericArguments[0];
         var outputType = genericArguments[1]; // probably not needed, output can be type checked
 
-        var headerOnly = Attribute.IsDefined(toolType.GetMethods()
+        var gbxParameter = toolType.GetMethods()
             .First(m => m.Name == nameof(IoTool.ProcessAsync))
-            .GetParameters()[0], typeof(HeaderOnlyAttribute));
+            .GetParameters()[0];
 
-        return await ProcessToolAsync(tool, data, inputType, headerOnly, cancellationToken);
+        var headerOnly = Attribute.IsDefined(gbxParameter, typeof(HeaderOnlyAttribute));
+        var ignoreExceptionsInBody = Attribute.IsDefined(gbxParameter, typeof(IgnoreExceptionsInBodyAttribute));
+
+        return await ProcessToolAsync(tool, data, inputType, headerOnly, ignoreExceptionsInBody, cancellationToken);
     }
 
     internal static Type? GetIoToolBaseType(Type toolType)
@@ -73,7 +76,7 @@ public sealed class ToolService
         return baseType;
     }
 
-    private async Task<IEnumerable<object>> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, CancellationToken cancellationToken)
+    private async Task<IEnumerable<object>> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, bool ignoreExceptionsInBody, CancellationToken cancellationToken)
     {
         if (inputType == typeof(BinData))
         {
@@ -90,7 +93,7 @@ public sealed class ToolService
             return await ProcessTextDataAsync(tool, data, cancellationToken);
         }
 
-        return await ProcessSpecificGbxDataAsync(tool, data, headerOnly, cancellationToken);
+        return await ProcessSpecificGbxDataAsync(tool, data, headerOnly, ignoreExceptionsInBody, cancellationToken);
     }
 
     private static async Task<IEnumerable<object>> ProcessBinDataAsync(IoTool tool, BinData data, CancellationToken cancellationToken)
@@ -176,14 +179,18 @@ public sealed class ToolService
         return outputs;
     }
 
-    private async Task<IEnumerable<object>> ProcessSpecificGbxDataAsync(IoTool tool, BinData data, bool headerOnly, CancellationToken cancellationToken)
+    private async Task<IEnumerable<object>> ProcessSpecificGbxDataAsync(IoTool tool, BinData data, bool headerOnly, bool ignoreExceptionsInBody, CancellationToken cancellationToken)
     {
         await using var ms = new MemoryStream(data.Data);
 
-        var gbx = await gbxService.ParseGbxAsync(ms, headerOnly);
-
+        var gbx = await gbxService.ParseGbxAsync(ms, headerOnly, ignoreExceptionsInBody);
         if (gbx is not null)
         {
+            if (gbx.Body.Exception is not null)
+            {
+                logger.LogError(gbx.Body.Exception, "Gbx has exceptions in body, but will be processed anyway.");
+            }
+
             gbx.FilePath = data.FileName;
             var output = await tool.ProcessAsync(gbx, cancellationToken);
             return output is null ? [] : [output];
@@ -205,11 +212,7 @@ public sealed class ToolService
 
                 try
                 {
-                    await using var msEntry = new MemoryStream();
-                    await entryStream.CopyToAsync(msEntry, cancellationToken);
-                    msEntry.Position = 0;
-
-                    var entryGbx = await gbxService.ParseGbxAsync(msEntry, headerOnly);
+                    var entryGbx = await gbxService.ParseGbxAsync(entryStream, headerOnly, ignoreExceptionsInBody);
 
                     if (entryGbx is null)
                     {

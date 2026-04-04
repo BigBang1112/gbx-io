@@ -1,5 +1,6 @@
 ﻿using GBX.NET;
 using GBX.NET.Engines.Game;
+using GbxIo.Components.Attributes;
 using TmEssentials;
 
 namespace GbxIo.Components.Tools;
@@ -9,7 +10,7 @@ public sealed class ExtractMapFromReplayIoTool(string endpoint, IServiceProvider
 {
     public override string Name => "Extract map from replay";
 
-    public override Task<Gbx<CGameCtnChallenge>> ProcessAsync(Gbx<CGameCtnReplayRecord> input, CancellationToken cancellationToken)
+    public override Task<Gbx<CGameCtnChallenge>> ProcessAsync([IgnoreExceptionsInBody] Gbx<CGameCtnReplayRecord> input, CancellationToken cancellationToken)
     {
         var map = input.Node.Challenge ?? throw new InvalidOperationException("No map found.");
 
