@@ -26,6 +26,11 @@ public sealed class ExtractMapFromReplayIoTool(string endpoint, IServiceProvider
         if (isManiaPlanet)
         {
             map.CreateChunk<CGameCtnChallenge.HeaderChunk03043003>();
+
+            if (map.KindInHeader == CGameCtnChallenge.MapKind.EndMarker)
+            {
+                map.KindInHeader = map.Kind;
+            }
         }
 
         var extension = isManiaPlanet ? ".Map.Gbx" : ".Challenge.Gbx";
