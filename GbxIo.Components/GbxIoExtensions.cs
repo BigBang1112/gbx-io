@@ -21,6 +21,7 @@ public static class GbxIoExtensions
 		services.AddTool<ExtractMeshIoTool>("extract-mesh");
 		services.AddTool<ExtractInputsIoTool>("extract-inputs");
         services.AddTool<ExtractInputsTmiIoTool>("extract-inputs-tmi");
+        services.AddTool<RemoveValidationGhostIoTool>("remove-validation-ghost");
         services.AddTool<ChangeToOldWoodPhysicsIoTool>("change-to-old-wood-physics");
         services.AddTool<ValidateWithoutLightmapsIoTool>("validate-without-lightmaps");
         services.AddTool<GbxToJsonIoTool>("gbx-to-json");
