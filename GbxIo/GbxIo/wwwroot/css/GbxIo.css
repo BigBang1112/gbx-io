@@ -1,6 +1,10 @@
 body {
-    background-color: #111;
+    background-color: var(--color-bg);
     max-height: 100vh;
+}
+
+.reu-button {
+    width: auto;
 }
 
 .reu-main {
