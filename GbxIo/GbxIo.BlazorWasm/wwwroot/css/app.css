@@ -1,3 +1,7 @@
+.reu-main {
+    height: 100vh;
+}
+
 #blazor-error-ui {
     color-scheme: light only;
     background: lightyellow;

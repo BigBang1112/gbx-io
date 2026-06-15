@@ -1,11 +1,12 @@
 body {
     background-color: #111;
+    max-height: 100vh;
 }
 
-.io-main {
-    margin: 20px;
-    display: flex;
-    gap: 20px;
+.reu-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    overflow: auto;
 }
 
 .io-upload-area {
