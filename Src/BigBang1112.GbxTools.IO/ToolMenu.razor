@@ -1,17 +1,34 @@
-@using Microsoft.AspNetCore.Components.Routing
-
 @inject NavigationManager NavManager
 @inject IEnumerable<IoTool> Tools
 
 <div class="tool-menu">
     @foreach (var tool in Tools)
     {
-        <ReuButton Href="@tool.Endpoint" NavLink="true">@tool.Name</ReuButton>
+        <ReuButton OnClick="() => SelectTool(tool)" Active="@(SelectedTool == tool)">@tool.Name</ReuButton>
     }
 </div>
 
 
 @code {
+    [Parameter, EditorRequired]
+    public string? SelectedToolEndpoint { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IoTool> SelectedToolChanged { get; set; }
+
     [Parameter]
     public bool Highlight { get; set; }
+
+    public IoTool? SelectedTool { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        SelectedTool = Tools.FirstOrDefault(t => t.Endpoint == SelectedToolEndpoint);
+    }
+
+    private async Task SelectTool(IoTool tool)
+    {
+        SelectedTool = tool;
+        await SelectedToolChanged.InvokeAsync(tool);
+    }
 }

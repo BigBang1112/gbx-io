@@ -1,10 +1,13 @@
-﻿@inject ToolService ToolService
+﻿@using Microsoft.JSInterop
 
-<PageTitle>Home</PageTitle>
+@inject ToolService ToolService
+@inject IJSRuntime JS
+
+<PageTitle>@GetTitle()</PageTitle>
 
 <ReuUploadScreen></ReuUploadScreen>
 <ReuMain>
-    <ToolMenu></ToolMenu>
+    <ToolMenu SelectedToolEndpoint="@Tool" SelectedToolChanged="OnSelectedToolChanged"></ToolMenu>
     <div class="io-upload-area">
         <ReuUploadButton>Upload via this button</ReuUploadButton>
     </div>
@@ -26,5 +29,12 @@
         }
 
         return title;
+    }
+
+    private async Task OnSelectedToolChanged(IoTool tool)
+    {
+        Tool = tool.Name;
+
+        await JS.InvokeVoidAsync("history.pushState", null, "", $"/{tool.Endpoint}");
     }
 }
