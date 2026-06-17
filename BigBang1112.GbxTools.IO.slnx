@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Src/BigBang1112.GbxTools.IO/BigBang1112.GbxTools.IO.csproj" Id="587cbb2c-98ec-4124-b9eb-a02e070edb5d" />
+  <Project Path="Src/BigBang1112.GbxTools.IO.BlazorWasm/BigBang1112.GbxTools.IO.BlazorWasm.csproj" Id="2cd692f0-1b55-4f12-aecd-f0c8ae130c73" />
+  <Project Path="Src/BigBang1112.GbxTools.IO.BlazorWebApp/BigBang1112.GbxTools.IO.BlazorWebApp.csproj" Id="21f5d82e-fcc6-4ac8-b054-a91967df8c0c" />
+  <Project Path="Src/BigBang1112.GbxTools.IO.BlazorWebApp.Client/BigBang1112.GbxTools.IO.BlazorWebApp.Client.csproj" Id="61e618ab-9b44-4303-a43d-4b7aa1aeaea8" />
+  <Project Path="Src/BigBang1112.GbxTools.IO.Photino/BigBang1112.GbxTools.IO.Photino.csproj" Id="b2c6d3fd-beb3-45ff-8800-1bda8678aa25" />
+</Solution>

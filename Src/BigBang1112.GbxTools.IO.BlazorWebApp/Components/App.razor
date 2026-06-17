@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    <script>
+        window.reuTheme = {
+            get: function () {
+                return document.documentElement.getAttribute('data-theme') || 'dark';
+            },
+            set: function (theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                try { localStorage.setItem('reu-theme', theme); } catch (e) { }
+                return theme;
+            },
+            toggle: function () {
+                return window.reuTheme.set(window.reuTheme.get() === 'light' ? 'dark' : 'light');
+            }
+        };
+        function applyTheme() {
+            var theme;
+            try { theme = localStorage.getItem('reu-theme'); } catch (e) { }
+            if (!theme) {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
+                    ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        applyTheme();
+        new MutationObserver(function () {
+            if (!document.documentElement.getAttribute('data-theme')) {
+                applyTheme();
+            }
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    </script>
+
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["css/app.css"]" />
+    <link rel="stylesheet" href="@Assets["BigBang1112.GbxTools.IO.BlazorWebApp.styles.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Reuniverse.Razor/reuniverse.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Reuniverse.Razor/Reuniverse.Razor.bundle.scp.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/BigBang1112.GbxTools.IO/css/GbxIo.css"]" />
+    <ImportMap />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]" autostart="false"></script>
+    <script type="module">
+        import { BrotliDecode } from './decode.min.js';
+        Blazor.start({
+          webAssembly: {
+            loadBootResource: function (type, name, defaultUri, integrity) {
+              if (type !== 'dotnetjs' && location.hostname !== 'localhost' && type !== 'configuration' && type !== 'manifest') {
+                return (async function () {
+                  const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                  if (!response.ok) {
+                    throw new Error(response.statusText);
+                  }
+                  const originalResponseBuffer = await response.arrayBuffer();
+                  const originalResponseArray = new Int8Array(originalResponseBuffer);
+                  const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                  const contentType = type ===
+                    'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                  return new Response(decompressedResponseArray,
+                    { headers: { 'content-type': contentType } });
+                })();
+              }
+            }
+          }
+        });
+    </script>
+</body>
+
+</html>
