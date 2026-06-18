@@ -35,6 +35,11 @@
                 applyTheme();
             }
         }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        window.gbxIo = {
+            scrollToolMenuToActive: function (behavior = 'smooth') {
+                document.querySelector('.tool-menu button.active,.tool-menu a.active')?.scrollIntoView({behavior: behavior, block: 'center', inline: 'center'});
+            }
+        };
     </script>
 
     <ResourcePreloader />
