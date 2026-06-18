@@ -7,6 +7,10 @@
     padding: 20px;
 }
 
+    .tool-menu:not(.tool-menu-loading) ::deep .reu-button {
+        animation: blurOut 0.3s forwards;
+    }
+
 .tool-menu-loading {
     pointer-events: none;
     position: relative;
@@ -22,3 +26,14 @@
         top: calc(50% - 70px);
         left: calc(50% - 70px);
     }
+
+
+@keyframes blurOut {
+    0% {
+        filter: blur(10px);
+    }
+
+    100% {
+        filter: blur(0);
+    }
+}
