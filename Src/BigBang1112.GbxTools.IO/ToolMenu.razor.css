@@ -7,10 +7,18 @@
     padding: 20px;
 }
 
-.tool-menu-placeholder {
-    width: 390px;
-    background: var(--color-surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.tool-menu-loading {
+    pointer-events: none;
+    position: relative;
+    background: var(--color-footer-bg);
 }
+
+    .tool-menu-loading ::deep .reu-button {
+        filter: blur(10px);
+    }
+
+    .tool-menu-loading ::deep div.loader {
+        position: absolute;
+        top: calc(50% - 70px);
+        left: calc(50% - 70px);
+    }

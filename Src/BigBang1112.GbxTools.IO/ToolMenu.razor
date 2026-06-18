@@ -1,21 +1,17 @@
 @inject NavigationManager NavManager
 @inject IEnumerable<IoTool> Tools
 
-@if (RendererInfo.IsInteractive)
-{
-    <div class="tool-menu" style="transform: translateX(@(RendererInfo.IsInteractive ? 0 : -100)%)">
-        @foreach (var tool in Tools)
-        {
-            <ReuButton OnClick="() => SelectTool(tool)" Active="@(SelectedTool == tool)">@tool.Name</ReuButton>
-        }
-    </div>
-}
-else
-{
-    <div class="tool-menu-placeholder">
-        <ReuLoader></ReuLoader>
-    </div>
-}
+<div class="tool-menu @(!RendererInfo.IsInteractive ? "tool-menu-loading" : "")">
+    @if (!RendererInfo.IsInteractive)
+    {
+        <ReuLoader Size="100" Thickness="16"></ReuLoader>
+    }
+
+    @foreach (var tool in Tools)
+    {
+        <ReuButton OnClick="() => SelectTool(tool)" Active="@(SelectedTool == tool)">@tool.Name</ReuButton>
+    }
+</div>
 
 
 @code {
