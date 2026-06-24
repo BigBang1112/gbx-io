@@ -56,13 +56,11 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
 
     public override async Task<ZipData> ProcessAsync(PakData input, CancellationToken cancellationToken)
     {
-        using var msInput = new MemoryStream(input.Data);
-
         var name = Path.GetFileNameWithoutExtension(input.FileName) ?? throw new InvalidOperationException("Input file name is null.");
 
         var key = keys[Game].GetValueOrDefault(name) ?? throw new InvalidOperationException("No key found for the input file.");
 
-        await using var pak = await Pak.ParseAsync(msInput, Convert.FromHexString(key).Select(x => (byte)(255 - x)).ToArray(), cancellationToken: cancellationToken);
+        await using var pak = await Pak.ParseAsync(input.Stream, Convert.FromHexString(key).Select(x => (byte)(255 - x)).ToArray(), cancellationToken: cancellationToken);
 
         var hashes = await GetFileHashesAsync();
 
@@ -117,7 +115,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
 
         await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} (100%)", CancellationToken.None);
 
-        return new ZipData($"{name}.zip", msOutput.ToArray());
+        return new ZipData($"{name}.zip", msOutput);
     }
 
     private static void CopyFileToStream(Pak pak, PakFile file, Stream stream)

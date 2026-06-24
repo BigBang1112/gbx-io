@@ -11,15 +11,14 @@ public sealed class CompressGbxIoTool(string endpoint, IServiceProvider provider
 
     public override async Task<GbxData> ProcessAsync(GbxData input, CancellationToken cancellationToken)
     {
-        await using var inputStream = new MemoryStream(input.Data);
-        await using var outputStream = new MemoryStream(input.Data.Length);
+        await using var outputStream = new MemoryStream((int)input.Stream.Length);
 
-        await Gbx.CompressAsync(inputStream, outputStream, cancellationToken);
+        await Gbx.CompressAsync(input.Stream, outputStream, cancellationToken);
 
-        var optimizedByteCount = inputStream.Length - outputStream.Length;
+        var optimizedByteCount = input.Stream.Length - outputStream.Length;
 
-        await ReportAsync($"Compressed by {optimizedByteCount / (double)inputStream.Length:P} ({ByteSize.FromBytes(optimizedByteCount)}).", cancellationToken);
+        await ReportAsync($"Compressed by {optimizedByteCount / (double)input.Stream.Length:P} ({ByteSize.FromBytes(optimizedByteCount)}).", cancellationToken);
 
-        return new GbxData(input.FileName, outputStream.ToArray());
+        return new GbxData(input.FileName, outputStream);
     }
 }

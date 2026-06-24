@@ -23,7 +23,7 @@ public sealed class ExtractThumbnailIoTool(string endpoint, IServiceProvider pro
 
             if (gbxMap.Node.ExportThumbnail(ms, SkiaSharp.SKEncodedImageFormat.Jpeg, 100))
             {
-                return new BinData((input.FilePath ?? "unknown") + ".jpg", ms.ToArray(), "image/jpeg");
+                return new BinData((input.FilePath ?? "unknown") + ".jpg", ms, "image/jpeg");
             }
 
             return null;
@@ -35,7 +35,7 @@ public sealed class ExtractThumbnailIoTool(string endpoint, IServiceProvider pro
 
             if (collector.ExportIcon(ms))
             {
-                return new BinData((input.FilePath ?? "unknown") + ".png", ms.ToArray(), "image/png");
+                return new BinData((input.FilePath ?? "unknown") + ".png", ms, "image/png");
             }
         }
 

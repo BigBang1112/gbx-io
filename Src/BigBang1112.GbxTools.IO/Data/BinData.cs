@@ -2,7 +2,11 @@
 
 namespace BigBang1112.GbxTools.IO.Data;
 
-public sealed record BinData(string? FileName, byte[] Data, string Type) : IData
+public sealed record BinData(string? FileName, Stream Stream, string Type) : IData
 {
-    public TextData ToTextData(string type = "text/plain") => new(FileName, Encoding.UTF8.GetString(Data), type);
+    public async Task<TextData> ToTextDataAsync(string type = "text/plain", CancellationToken cancellationToken = default)
+    {
+        using var reader = new StreamReader(Stream, Encoding.UTF8);
+        return new(FileName, await reader.ReadToEndAsync(cancellationToken), type);
+    }
 }
