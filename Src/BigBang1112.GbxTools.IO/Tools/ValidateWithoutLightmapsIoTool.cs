@@ -8,6 +8,9 @@ public sealed class ValidateWithoutLightmapsIoTool(string endpoint, IServiceProv
 {
     public override string Name => "Validate without lightmaps";
 
+    public override IEnumerable<string> InputExtensions => ["Map.Gbx"];
+    public override IEnumerable<string> OutputExtensions => ["Map.Gbx"];
+
     public override Task<Gbx<CGameCtnChallenge>> ProcessAsync(Gbx<CGameCtnChallenge> input, CancellationToken cancellationToken)
     {
         var output = input;

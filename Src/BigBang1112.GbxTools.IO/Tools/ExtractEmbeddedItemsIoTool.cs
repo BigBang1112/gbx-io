@@ -5,20 +5,20 @@ using BigBang1112.GbxTools.IO.Data;
 namespace BigBang1112.GbxTools.IO.Tools;
 
 public sealed class ExtractEmbeddedItemsIoTool(string endpoint, IServiceProvider provider)
-    : IoTool<Gbx<CGameCtnChallenge>, BinData>(endpoint, provider)
+    : IoTool<Gbx<CGameCtnChallenge>, ZipData>(endpoint, provider)
 {
     public override string Name => "Extract embedded items";
 
-    public override Task<BinData> ProcessAsync(Gbx<CGameCtnChallenge> input, CancellationToken cancellationToken)
+    public override Task<ZipData> ProcessAsync(Gbx<CGameCtnChallenge> input, CancellationToken cancellationToken)
     {
-        if (input.Node.EmbeddedZipData is null || input.Node.EmbeddedZipData.Length == 0)
+        if (input.Node.EmbeddedZipData is null or { Length: 0 })
         {
             throw new InvalidOperationException("No embedded items found.");
         }
 
-        var fileName = Path.GetFileNameWithoutExtension(input.FilePath) + ".zip";
+        var fileName = GbxPath.GetFileNameWithoutExtension(input.FilePath) + ".zip";
 
-        var zipData = new BinData(fileName, input.Node.EmbeddedZipData);
+        var zipData = new ZipData(fileName, input.Node.EmbeddedZipData);
 
         return Task.FromResult(zipData);
     }

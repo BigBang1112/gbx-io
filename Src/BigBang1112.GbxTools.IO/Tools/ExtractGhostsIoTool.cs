@@ -1,5 +1,6 @@
 ﻿using GBX.NET;
 using GBX.NET.Engines.Game;
+using GBX.NET.Managers;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -8,12 +9,16 @@ public sealed class ExtractGhostsIoTool(string endpoint, IServiceProvider provid
 {
     public override string Name => "Extract ghosts";
 
+    public override IEnumerable<string> InputExtensions => ClassManager.GetFileExtensions(CGameCtnReplayRecord.Id)
+        .Concat(ClassManager.GetFileExtensions(CGameCtnMediaClip.Id))
+        .Concat(ClassManager.GetFileExtensions(CGameCtnChallenge.Id));
+
     public override Task<IEnumerable<Gbx<CGameCtnGhost>>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
     {
         var fileName = Path.GetFileName(input.FilePath);
 
 		IEnumerable<CGameCtnGhost> ghosts;
-
+        
         switch (input)
         {
             case Gbx<CGameCtnReplayRecord> replay:

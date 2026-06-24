@@ -3,4 +3,6 @@
 public interface IData
 {
     string? FileName { get; }
+    string Type { get; }
+    byte[] Data { get; }
 }

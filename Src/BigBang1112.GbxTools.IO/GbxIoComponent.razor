@@ -1,7 +1,11 @@
-﻿@using Microsoft.JSInterop
+﻿@using System.IO.Compression
+@using BigBang1112.GbxTools.IO.Data
+@using GBX.NET
+@using Microsoft.JSInterop
 
 @inject ToolService ToolService
 @inject IJSRuntime JS
+@inject IDownloadService DownloadService
 
 @{
     var ioTool = Tool is null ? null : ToolService.GetTool(Tool);
@@ -9,18 +13,45 @@
 
 <PageTitle>@GetTitle()</PageTitle>
 
-<ReuUploadScreen></ReuUploadScreen>
+<ReuUploadScreen OnUpload="ImportAsync" Accept="@GetAccept(ioTool)"></ReuUploadScreen>
 <ReuMain>
     <ToolMenu SelectedToolEndpoint="@Tool" SelectedToolChanged="OnSelectedToolChanged"></ToolMenu>
     <div class="io-upload-area">
         @if (ioTool is null)
         {
-            <p>Please select a tool</p>
+            <h1>Please select a tool</h1>
         }
         else
         {
             <h1>@ioTool.Name</h1>
-            <ReuUploadButton>Upload via this button</ReuUploadButton>
+            <div class="input-output">
+                <div class="gbx-item">
+                    <img src="@GetFileIconPath(ioTool.InputExtensions)" alt="Gbx" width="128" height="128" />
+                    <div class="extensions">
+                        @foreach (var extension in ioTool.InputExtensions)
+                        {
+                            <div>*.@extension</div>
+                        }
+                    </div>
+                </div>
+                <img src="@GetIconPath("arrow_right.svg")" />
+                <ReuUploadButton CssClass="upload-button" OnUpload="ImportAsync" Accept="@GetAccept(ioTool)">
+                    <img src="@GetIconPath("upload.svg")" alt="Upload" />
+                </ReuUploadButton>
+                <img src="@GetIconPath("arrow_right.svg")" />
+                <div class="gbx-item">
+                    <img src="@GetFileIconPath(ioTool.OutputExtensions)" alt="Gbx" width="128" height="128" />
+                    <div class="extensions">
+                        @foreach (var extension in ioTool.OutputExtensions)
+                        {
+                            <div>*.@extension</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="status">
+                Some weird progress idk
+            </div>
         }
     </div>
 </ReuMain>
@@ -28,6 +59,42 @@
 @code {
     [Parameter, EditorRequired]
     public string? Tool { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("window.gbxIo.scrollToolMenuToActive");
+        }
+    }
+
+    string GetAccept(IoTool? ioTool)
+    {
+        return string.Join(',', ioTool?.InputExtensions.Select(e => $".{e}") ?? []);
+    }
+
+    string GetIconPath(string filePath)
+    {
+        return $"_content/BigBang1112.GbxTools.IO/icons/{filePath}";
+    }
+
+    string GetFileIconPath(IEnumerable<string> extensions)
+    {
+        foreach (var extension in extensions)
+        {
+            if (extension.EndsWith("gbx", StringComparison.OrdinalIgnoreCase))
+            {
+                return GetIconPath("gbx.png");
+            }
+
+            if (extension.EndsWith("pak", StringComparison.OrdinalIgnoreCase) || extension.EndsWith("zip", StringComparison.OrdinalIgnoreCase))
+            {
+                return GetIconPath("folder_zip.svg");
+            }
+        }
+
+        return GetIconPath("file_export.svg");
+    }
 
     string GetTitle()
     {
@@ -43,18 +110,93 @@
         return title;
     }
 
-    private async Task OnSelectedToolChanged(IoTool tool)
+    async Task OnSelectedToolChanged(IoTool tool)
     {
         Tool = tool.Endpoint;
 
         await JS.InvokeVoidAsync("history.pushState", null, "", $"/{tool.Endpoint}");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    async Task ImportAsync(UploadEventArgs args)
     {
-        if (firstRender)
+        if (Tool is null)
         {
-            await JS.InvokeVoidAsync("window.gbxIo.scrollToolMenuToActive");
+            return;
+        }
+
+        var tool = ToolService.GetTool(Tool);
+        if (tool is null)
+        {
+            return;
+        }
+
+        if (args.Type == "application/zip")
+        {
+            await using var msInput = new MemoryStream(args.Data);
+            using var zipInput = new ZipArchive(msInput, ZipArchiveMode.Read);
+
+            await using var msOutput = new MemoryStream();
+            using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create))
+            {
+                foreach (var entry in zipInput.Entries)
+                {
+                    await using var entryStream = entry.Open();
+                    using var entryMs = new MemoryStream();
+                    await entryStream.CopyToAsync(entryMs);
+
+                    var binData = new BinData(args.FileName, entryMs.ToArray(), args.Type);
+
+                    foreach (var output in await ToolService.ProcessFileAsync(tool.Endpoint, binData, CancellationToken.None))
+                    {
+                        await foreach (var fileData in ProcessOutputAsync(output))
+                        {
+                            await using var stream = zipOutput.CreateEntry(fileData.FileName).Open();
+                            await stream.WriteAsync(fileData.Data, 0, fileData.Data.Length);
+                        }
+                    }
+                }
+            }
+
+            await DownloadService.DownloadAsync($"{Path.GetFileNameWithoutExtension(args.FileName)}.zip", msOutput);
+        }
+        else
+        {
+            var binData = new BinData(args.FileName, args.Data, args.Type);
+
+            foreach (var output in await ToolService.ProcessFileAsync(tool.Endpoint, binData, CancellationToken.None))
+            {
+                await foreach (var fileData in ProcessOutputAsync(output))
+                {
+                    using var ms = new MemoryStream(fileData.Data);
+                    await DownloadService.DownloadAsync(fileData.FileName, ms);
+                }
+            }
+        }
+    }
+
+    async IAsyncEnumerable<IData> ProcessOutputAsync(object? output)
+    {
+        if (output is IEnumerable<object> enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                await foreach (var dataInEnumerable in ProcessOutputAsync(item))
+                {
+                    yield return dataInEnumerable;
+                }
+            }
+        }
+
+        if (output is IData data)
+        {
+            yield return data;
+        }
+
+        if (output is Gbx gbx)
+        {
+            var ms = new MemoryStream();
+            gbx.Save(ms);
+            yield return new GbxData(gbx.FilePath, ms.ToArray());
         }
     }
 }

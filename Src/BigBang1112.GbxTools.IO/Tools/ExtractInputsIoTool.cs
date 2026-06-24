@@ -11,8 +11,6 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
 {
     public override string Name => "Extract inputs";
 
-    protected virtual string Format => "txt";
-
     public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
 	{
         var fileName = Path.GetFileName(input.FilePath);
@@ -42,14 +40,14 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
 
         if (replayInputs.Any())
         {
-            inputFiles.Add(new TextData(Path.GetFileNameWithoutExtension(fileName) + ".txt", CreateInputText(replayInputs), Format));
+            inputFiles.Add(new TextData(Path.GetFileNameWithoutExtension(fileName) + ".txt", CreateInputText(replayInputs)));
         }
 
         var i = 0;
 
         foreach (var inputs in ghostInputs.Where(x => x.Any()))
         {
-            inputFiles.Add(new TextData($"{GbxPath.GetFileNameWithoutExtension(fileName ?? "Ghost")}_{++i:00}.txt", CreateInputText(inputs), Format));
+            inputFiles.Add(new TextData($"{GbxPath.GetFileNameWithoutExtension(fileName ?? "Ghost")}_{++i:00}.txt", CreateInputText(inputs)));
         }
 
         return Task.FromResult(inputFiles.AsEnumerable());

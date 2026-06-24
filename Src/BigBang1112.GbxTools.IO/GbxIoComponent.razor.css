@@ -1,5 +1,47 @@
-﻿.my-component {
-    border: 2px dashed red;
-    padding: 1em;
-    margin: 1em 0;
+﻿.io-upload-area {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    overflow: auto;
+}
+
+h1 {
+    font-size: 300%;
+    margin: 0;
+    text-align: center;
+}
+
+::deep .upload-button {
+    width: 200px;
+    height: 175px;
+}
+
+::deep .upload-button img {
+    width: 75%;
+}
+
+.input-output {
+    display: flex;
+    gap: 1rem;
+    height: 200px;
+}
+
+.gbx-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 150%;
+    width: 150px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    font-size: 150%;
+    height: 64px;
+}
+
+.extensions {
+    text-align: center;
 }

@@ -7,7 +7,7 @@ using System.IO.Compression;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<BinData, BinData>(endpoint, provider)
+public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<PakData, ZipData>(endpoint, provider)
 {
     private static readonly Dictionary<string, Dictionary<string, string>> keys = new()
     {
@@ -54,7 +54,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<B
 
     protected virtual string Game => "TM";
 
-    public override async Task<BinData> ProcessAsync(BinData input, CancellationToken cancellationToken)
+    public override async Task<ZipData> ProcessAsync(PakData input, CancellationToken cancellationToken)
     {
         using var msInput = new MemoryStream(input.Data);
 
@@ -117,7 +117,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<B
 
         await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} (100%)", CancellationToken.None);
 
-        return new BinData($"{name}.zip", msOutput.ToArray());
+        return new ZipData($"{name}.zip", msOutput.ToArray());
     }
 
     private static void CopyFileToStream(Pak pak, PakFile file, Stream stream)

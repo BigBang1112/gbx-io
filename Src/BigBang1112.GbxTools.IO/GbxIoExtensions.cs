@@ -11,7 +11,7 @@ public static class GbxIoExtensions
         services.AddScoped<GbxService>();
         services.AddScoped<ToolService>();
 
-        services.AddTool<OptimizeGbxIoTool>("optimize-gbx");
+        services.AddTool<CompressGbxIoTool>("optimize-gbx");
         services.AddTool<DecompressGbxIoTool>("decompress-gbx");
         services.AddTool<ExtractMapFromReplayIoTool>("extract-map-from-replay");
         services.AddTool<ExtractThumbnailIoTool>("extract-thumbnail");

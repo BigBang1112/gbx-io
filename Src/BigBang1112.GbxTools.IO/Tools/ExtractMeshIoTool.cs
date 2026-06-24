@@ -1,5 +1,4 @@
-﻿using GBX.NET.Engines.Game;
-using GBX.NET;
+﻿using GBX.NET;
 using GBX.NET.Engines.Plug;
 using GBX.NET.Engines.GameData;
 using BigBang1112.GbxTools.IO.Data;
@@ -10,6 +9,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
 	: IoTool<Gbx, IEnumerable<TextData>>(endpoint, provider)
 {
 	public override string Name => "Extract mesh (OBJ+MTL)";
+
+    public override IEnumerable<string> OutputExtensions => ["obj", "mtl"];
 
 	public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
 	{
@@ -22,8 +23,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
 				using (var mtlWriter = new StringWriter())
 				{
 					solid.Node.ExportToObj(objWriter, mtlWriter, 3);
-					files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString(), "obj"));
-					files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString(), "mtl"));
+					files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString()));
+					files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString()));
 				}
 				break;
 			case Gbx<CPlugPrefab> prefab:
@@ -45,8 +46,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
                     using var mtlWriter = new StringWriter();
 
                     staticObject.Mesh.ExportToObj(objWriter, mtlWriter, 3);
-                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString(), "obj"));
-                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString(), "mtl"));
+                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString()));
+                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString()));
                 }
 				break;
 			case Gbx<CGameItemModel> itemModel:
@@ -56,8 +57,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
                     using var mtlWriter = new StringWriter();
 
                     edition.MeshCrystal.ExportToObj(objWriter, mtlWriter, 3);
-                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString(), "obj"));
-                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString(), "mtl"));
+                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString()));
+                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString()));
                 }
 				else if (itemModel.Node.EntityModelEdition is CGameBlockItem block)
 				{
@@ -79,8 +80,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
                         }
 
                         variant.Crystal.ExportToObj(objWriter, mtlWriter, 3);
-                        files.Add(new TextData($"{newFileName}.obj", objWriter.ToString(), "obj"));
-                        files.Add(new TextData($"{newFileName}.mtl", mtlWriter.ToString(), "mtl"));
+                        files.Add(new TextData($"{newFileName}.obj", objWriter.ToString()));
+                        files.Add(new TextData($"{newFileName}.mtl", mtlWriter.ToString()));
                     }
 				}
 				else if (itemModel.Node.EntityModel is CGameCommonItemEntityModel { StaticObject.Mesh: not null } model)
@@ -89,8 +90,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
                     using var mtlWriter = new StringWriter();
 
                     model.StaticObject.Mesh.ExportToObj(objWriter, mtlWriter, 3);
-                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString(), "obj"));
-                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString(), "mtl"));
+                    files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString()));
+                    files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString()));
                 }
 				else
                 {
@@ -102,8 +103,8 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
 				using (var mtlWriter = new StringWriter())
 				{
                     solid2.Node.ExportToObj(objWriter, mtlWriter, 3);
-					files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString(), "obj"));
-					files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString(), "mtl"));
+					files.Add(new TextData(input.FilePath + ".obj", objWriter.ToString()));
+					files.Add(new TextData(input.FilePath + ".mtl", mtlWriter.ToString()));
 				}
 				break;
             default:

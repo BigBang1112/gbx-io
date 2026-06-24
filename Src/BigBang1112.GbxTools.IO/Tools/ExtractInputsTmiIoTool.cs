@@ -8,8 +8,6 @@ public sealed class ExtractInputsTmiIoTool(string endpoint, IServiceProvider pro
 {
     public override string Name => "Extract inputs (TMI)";
 
-    protected override string Format => "python";
-
     protected override string CreateInputText(IEnumerable<IInput> inputs)
     {
         var sb = new StringBuilder();
