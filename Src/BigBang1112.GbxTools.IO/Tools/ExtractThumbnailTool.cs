@@ -8,7 +8,7 @@ using GBX.NET.Managers;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractThumbnailIoTool(string endpoint, IServiceProvider provider)
+public sealed class ExtractThumbnailTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx, BinData?>(endpoint, provider)
 {
     public override string Name => "Extract thumbnail/icon";

@@ -4,7 +4,7 @@ using BigBang1112.GbxTools.IO.Data;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractEmbeddedItemsIoTool(string endpoint, IServiceProvider provider)
+public sealed class ExtractEmbeddedItemsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, ZipData>(endpoint, provider)
 {
     public override string Name => "Extract embedded items";

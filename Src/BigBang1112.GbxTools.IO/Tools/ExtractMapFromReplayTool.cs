@@ -4,7 +4,7 @@ using TmEssentials;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractMapFromReplayIoTool(string endpoint, IServiceProvider provider)
+public sealed class ExtractMapFromReplayTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnReplayRecord>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
     public override string Name => "Extract map from replay";

@@ -4,7 +4,7 @@ using BigBang1112.GbxTools.IO.Data;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class GbxToJsonIoTool(string endpoint, IServiceProvider provider)
+public sealed class GbxToJsonTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx, TextData>(endpoint, provider)
 {
     public override string Name => "Gbx to JSON";

@@ -5,7 +5,7 @@ using System.IO.Compression;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class CompressEmbeddedItemsIoTool(string endpoint, IServiceProvider provider)
+public sealed class CompressEmbeddedItemsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
     public override string Name => "Compress embedded items";

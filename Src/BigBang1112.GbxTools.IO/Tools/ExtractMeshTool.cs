@@ -7,7 +7,7 @@ using GBX.NET.Managers;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider)
+public sealed class ExtractMeshTool(string endpoint, IServiceProvider provider)
 	: IoTool<Gbx, IEnumerable<TextData>>(endpoint, provider)
 {
 	public override string Name => "Extract mesh (OBJ+MTL)";

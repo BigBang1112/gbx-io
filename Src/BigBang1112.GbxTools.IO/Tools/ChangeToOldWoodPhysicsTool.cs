@@ -3,7 +3,7 @@ using GBX.NET.Engines.Game;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ChangeToOldWoodPhysicsIoTool(string endpoint, IServiceProvider provider)
+public sealed class ChangeToOldWoodPhysicsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
     public override string Name => "Change to old wood physics";

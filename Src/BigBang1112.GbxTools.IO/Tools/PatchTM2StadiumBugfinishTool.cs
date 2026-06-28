@@ -3,7 +3,7 @@ using GBX.NET.Engines.Game;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class PatchTM2StadiumBugfinishIoTool(string endpoint, IServiceProvider provider)
+public sealed class PatchTM2StadiumBugfinishTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
     public override string Name => "Patch TM² Stadium bugfinish";

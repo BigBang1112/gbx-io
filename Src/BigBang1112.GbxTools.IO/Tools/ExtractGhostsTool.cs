@@ -4,7 +4,7 @@ using GBX.NET.Managers;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractGhostsIoTool(string endpoint, IServiceProvider provider)
+public sealed class ExtractGhostsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx, IEnumerable<Gbx<CGameCtnGhost>>>(endpoint, provider)
 {
     public override string Name => "Extract ghosts";

@@ -11,20 +11,20 @@ public static class GbxIoExtensions
         services.AddScoped<GbxService>();
         services.AddScoped<ToolService>();
 
-        services.AddTool<CompressGbxIoTool>("compress-gbx");
-        services.AddTool<DecompressGbxIoTool>("decompress-gbx");
-        services.AddTool<ExtractMapFromReplayIoTool>("extract-map-from-replay");
-        services.AddTool<ExtractThumbnailIoTool>("extract-thumbnail");
-        services.AddTool<CompressEmbeddedItemsIoTool>("compress-embedded-items");
-        services.AddTool<ExtractEmbeddedItemsIoTool>("extract-embedded-items");
-        services.AddTool<ExtractGhostsIoTool>("extract-ghosts");
-        services.AddTool<ExtractMeshIoTool>("extract-mesh");
-        services.AddTool<ExtractInputsIoTool>("extract-inputs");
-        services.AddTool<ExtractInputsTmiIoTool>("extract-inputs-tmi");
-        services.AddTool<ChangeToOldWoodPhysicsIoTool>("change-to-old-wood-physics");
-        services.AddTool<ValidateWithoutLightmapsIoTool>("validate-without-lightmaps");
-        services.AddTool<PatchTM2StadiumBugfinishIoTool>("patch-tm2-stadium-bugfinish");
-        services.AddTool<GbxToJsonIoTool>("gbx-to-json");
+        services.AddTool<CompressGbxTool>("compress-gbx");
+        services.AddTool<DecompressGbxTool>("decompress-gbx");
+        services.AddTool<ExtractMapFromReplayTool>("extract-map-from-replay");
+        services.AddTool<ExtractThumbnailTool>("extract-thumbnail");
+        services.AddTool<CompressEmbeddedItemsTool>("compress-embedded-items");
+        services.AddTool<ExtractEmbeddedItemsTool>("extract-embedded-items");
+        services.AddTool<ExtractGhostsTool>("extract-ghosts");
+        services.AddTool<ExtractMeshTool>("extract-mesh");
+        services.AddTool<ExtractInputsTool>("extract-inputs");
+        services.AddTool<ExtractInputsTmiTool>("extract-inputs-tmi");
+        services.AddTool<ChangeToOldWoodPhysicsTool>("change-to-old-wood-physics");
+        services.AddTool<ValidateWithoutLightmapsTool>("validate-without-lightmaps");
+        services.AddTool<PatchTM2StadiumBugfinishTool>("patch-tm2-stadium-bugfinish");
+        services.AddTool<GbxToJsonTool>("gbx-to-json");
         services.AddTool<PakToZipTool>("pak-to-zip");
 
         return services;

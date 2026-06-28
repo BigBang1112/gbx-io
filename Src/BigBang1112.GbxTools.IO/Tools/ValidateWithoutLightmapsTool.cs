@@ -3,7 +3,7 @@ using GBX.NET;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ValidateWithoutLightmapsIoTool(string endpoint, IServiceProvider provider)
+public sealed class ValidateWithoutLightmapsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
     public override string Name => "Validate without lightmaps";

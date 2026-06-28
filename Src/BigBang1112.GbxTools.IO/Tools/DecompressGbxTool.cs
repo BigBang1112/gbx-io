@@ -4,7 +4,7 @@ using BigBang1112.GbxTools.IO.Data;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class DecompressGbxIoTool(string endpoint, IServiceProvider provider)
+public sealed class DecompressGbxTool(string endpoint, IServiceProvider provider)
     : IoTool<GbxData, GbxData>(endpoint, provider)
 {
     public override string Name => "Decompress Gbx";

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
+public class ExtractInputsTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx, IEnumerable<TextData>>(endpoint, provider)
 {
     public override string Name => "Extract inputs";

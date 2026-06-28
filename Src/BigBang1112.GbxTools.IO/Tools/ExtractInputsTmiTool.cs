@@ -3,8 +3,8 @@ using System.Text;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ExtractInputsTmiIoTool(string endpoint, IServiceProvider provider)
-    : ExtractInputsIoTool(endpoint, provider)
+public sealed class ExtractInputsTmiTool(string endpoint, IServiceProvider provider)
+    : ExtractInputsTool(endpoint, provider)
 {
     public override string Name => "Extract inputs (TMI)";
 
