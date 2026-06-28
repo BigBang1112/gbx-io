@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BigBang1112.GbxTools.IO.Photino.Services;
+using BigBang1112.GbxTools.IO.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Photino.Blazor;
 
 namespace BigBang1112.GbxTools.IO.Photino
@@ -12,6 +14,7 @@ namespace BigBang1112.GbxTools.IO.Photino
             builder.Services.AddLogging();
 
             builder.Services.AddGbxIo();
+            builder.Services.AddTransient<IDownloadService, DownloadService>();
 
             // register root component
             builder.RootComponents.Add<App>("app");

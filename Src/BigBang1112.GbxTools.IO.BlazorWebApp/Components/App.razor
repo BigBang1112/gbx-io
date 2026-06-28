@@ -6,35 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
 
+    <script src="@Assets["_content/Reuniverse.Razor/reuniverse.theme.js"]"></script>
     <script>
-        window.reuTheme = {
-            get: function () {
-                return document.documentElement.getAttribute('data-theme') || 'dark';
-            },
-            set: function (theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                try { localStorage.setItem('reu-theme', theme); } catch (e) { }
-                return theme;
-            },
-            toggle: function () {
-                return window.reuTheme.set(window.reuTheme.get() === 'light' ? 'dark' : 'light');
-            }
-        };
-        function applyTheme() {
-            var theme;
-            try { theme = localStorage.getItem('reu-theme'); } catch (e) { }
-            if (!theme) {
-                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
-                    ? 'light' : 'dark';
-            }
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-        applyTheme();
-        new MutationObserver(function () {
-            if (!document.documentElement.getAttribute('data-theme')) {
-                applyTheme();
-            }
-        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
         window.gbxIo = {
             scrollToolMenuToActive: function (behavior = 'smooth') {
                 document.querySelector('.tool-menu button.active,.tool-menu a.active')?.scrollIntoView({behavior: behavior, block: 'center', inline: 'center'});
@@ -93,6 +66,7 @@
         URL.revokeObjectURL(url);
       }
     </script>
+    <script src="@Assets["_content/Reuniverse.Razor/reuniverse.js"]" defer></script>
 </body>
 
 </html>
