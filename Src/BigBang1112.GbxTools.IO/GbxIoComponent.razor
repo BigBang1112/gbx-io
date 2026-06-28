@@ -1,6 +1,7 @@
 ﻿@using System.IO.Compression
 @using BigBang1112.GbxTools.IO.Data
 @using GBX.NET
+@using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
 
 @inject ToolService ToolService
@@ -26,7 +27,7 @@
             <h1>@ioTool.Name</h1>
             <div class="input-output">
                 <div class="gbx-item">
-                    <img src="@GetFileIconPath(ioTool.InputExtensions)" alt="Gbx" width="128" height="128" />
+                    <img src="@GetFileIconPath(ioTool.InputExtensions)" alt="Gbx" class="@(ioTool.InputExtensions.Any(x => x.EndsWith("gbx", StringComparison.OrdinalIgnoreCase) && !x.EndsWith("pack.gbx", StringComparison.OrdinalIgnoreCase)) ? "gbx" : "")" width="128" height="128" />
                     <div class="extensions">
                         @foreach (var extension in ioTool.InputExtensions)
                         {
@@ -40,7 +41,7 @@
                 </ReuUploadButton>
                 <img src="@GetIconPath("arrow_right.svg")" class="arrow" />
                 <div class="gbx-item">
-                    <img src="@GetFileIconPath(ioTool.OutputExtensions)" alt="Gbx" width="128" height="128" />
+                    <img src="@GetFileIconPath(ioTool.OutputExtensions)" alt="Gbx" class="@(ioTool.OutputExtensions.Any(x => x.EndsWith("gbx", StringComparison.OrdinalIgnoreCase) && !x.EndsWith("pack.gbx", StringComparison.OrdinalIgnoreCase)) ? "gbx" : "")" width="128" height="128" />
                     <div class="extensions">
                         @foreach (var extension in ioTool.OutputExtensions)
                         {
@@ -54,17 +55,34 @@
                 @Message
             </div>
             <div class="extras">
-                extras
+                <ReuButton Enable="false">API</ReuButton>
+                <ReuButton OnClick="() => logsOpen = true">Logs</ReuButton>
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="error-message">
+                        @ErrorMessage
+                    </div>
+                }
             </div>
         }
     </div>
 </ReuMain>
+<ReuModal @bind-IsOpen="logsOpen" Title="@($"Logs{(ioTool is null ? null : $" - {ioTool.Name}")}")" MaxWidth="100%" Height="100%">
+    @if (ioTool is not null)
+    {
+        <ReuLogs Provider="GetOrCreateProvider(ioTool.Endpoint)" style="height: 100%; box-sizing: border-box;" MaxEntries="99999"></ReuLogs>                
+    }
+</ReuModal>
 
-@code {
+    @code {
+    private bool logsOpen = false;
+    private Dictionary<string, ReuLoggerProvider> logProviders = [];
+
     [Parameter, EditorRequired]
     public string? Tool { get; set; }
 
     public string Message { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; } = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -72,6 +90,16 @@
         {
             await JS.InvokeVoidAsync("window.gbxIo.scrollToolMenuToActive");
         }
+    }
+
+    ReuLoggerProvider GetOrCreateProvider(string toolEndpoint)
+    {
+        if (!logProviders.TryGetValue(toolEndpoint, out var provider))
+        {
+            provider = new ReuLoggerProvider();
+            logProviders[toolEndpoint] = provider;
+        }
+        return provider;
     }
 
     string GetAccept(IoTool? ioTool)
@@ -120,6 +148,7 @@
     {
         Tool = tool.Endpoint;
         Message = string.Empty;
+        ErrorMessage = string.Empty;
 
         await JS.InvokeVoidAsync("history.pushState", null, "", $"/{tool.Endpoint}");
     }
@@ -143,43 +172,61 @@
             StateHasChanged();
         });
 
-        if (args.Type == "application/zip")
+        var logger = GetOrCreateProvider(tool.Endpoint).CreateLogger(tool.Endpoint);
+
+        try
         {
-            await using var msInput = new MemoryStream(args.Data);
-            using var zipInput = new ZipArchive(msInput, ZipArchiveMode.Read);
-
-            var msOutput = new MemoryStream();
-            using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create))
+            if (args.Type == "application/zip")
             {
-                foreach (var entry in zipInput.Entries)
+                await using var msInput = new MemoryStream(args.Data);
+                using var zipInput = new ZipArchive(msInput, ZipArchiveMode.Read);
+
+                var msOutput = new MemoryStream();
+                using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create))
                 {
-                    await using var entryStream = entry.Open();
-                    var binData = new BinData(args.FileName, entryStream, args.Type);
-
-                    var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, CancellationToken.None);
-
-                    await foreach (var fileData in ProcessOutputAsync(output))
+                    foreach (var entry in zipInput.Entries)
                     {
-                        await using var stream = zipOutput.CreateEntry(fileData.FileName).Open();
-                        await fileData.Stream.CopyToAsync(stream);
+                        await using var entryStream = entry.Open();
+                        var binData = new BinData(args.FileName, entryStream, args.Type);
+
+                        try
+                        {
+                            var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, CancellationToken.None);
+
+                            await foreach (var fileData in ProcessOutputAsync(output))
+                            {
+                                await using var stream = zipOutput.CreateEntry(fileData.FileName).Open();
+                                await fileData.Stream.CopyToAsync(stream);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Error processing file {FileName}", entry.FullName);
+                            ErrorMessage = ex.Message;
+                        }
                     }
                 }
+
+                msOutput.Position = 0; // TODO really needed?
+
+                await DownloadService.DownloadAsync($"{Path.GetFileNameWithoutExtension(args.FileName)}.zip", msOutput);
             }
-
-            msOutput.Position = 0; // TODO really needed?
-
-            await DownloadService.DownloadAsync($"{Path.GetFileNameWithoutExtension(args.FileName)}.zip", msOutput);
-        }
-        else
-        {
-            var binData = new BinData(args.FileName, new MemoryStream(args.Data), args.Type);
-
-            var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, CancellationToken.None);
-
-            await foreach (var fileData in ProcessOutputAsync(output))
+            else
             {
-                await DownloadService.DownloadAsync(fileData.FileName, fileData.Stream);
+                var binData = new BinData(args.FileName, new MemoryStream(args.Data), args.Type);
+
+                var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, CancellationToken.None);
+
+                await foreach (var fileData in ProcessOutputAsync(output))
+                {
+                    await DownloadService.DownloadAsync(fileData.FileName, fileData.Stream);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error processing file {FileName}", args.FileName);
+            ErrorMessage = ex.Message;
         }
     }
 

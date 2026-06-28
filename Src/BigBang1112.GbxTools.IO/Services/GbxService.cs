@@ -16,8 +16,10 @@ public sealed class GbxService(ILogger<GbxService> logger)
         Gbx.ZLib = new ZLib();
     }
 
-    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly)
+    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly, ILogger? logger)
     {
+        logger ??= this.logger;
+
         try
         {
             return headerOnly

@@ -25,8 +25,10 @@ public sealed class ToolService
         return serviceProvider.GetKeyedService<IoTool>(toolId);
     }
 
-    public async Task<object?> ProcessFileAsync(string toolId, BinData data, CancellationToken cancellationToken)
+    public async Task<object?> ProcessFileAsync(string toolId, BinData data, ILogger? logger, CancellationToken cancellationToken)
     {
+        logger ??= this.logger;
+
         var tool = serviceProvider.GetKeyedService<IoTool>(toolId);
 
         if (tool is null)
@@ -53,7 +55,7 @@ public sealed class ToolService
             .First(m => m.Name == nameof(IoTool.ProcessAsync))
             .GetParameters()[0], typeof(HeaderOnlyAttribute));
 
-        return await ProcessToolAsync(tool, data, inputType, headerOnly, cancellationToken);
+        return await ProcessToolAsync(tool, data, inputType, headerOnly, logger, cancellationToken);
     }
 
     internal static Type? GetIoToolBaseType(Type toolType)
@@ -73,7 +75,7 @@ public sealed class ToolService
         return baseType;
     }
 
-    private async Task<object?> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, CancellationToken cancellationToken)
+    private async Task<object?> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, ILogger logger, CancellationToken cancellationToken)
     {
         if (inputType == typeof(BinData))
         {
@@ -100,7 +102,7 @@ public sealed class ToolService
             return await tool.ProcessAsync(await data.ToTextDataAsync(cancellationToken: cancellationToken), cancellationToken);
         }
 
-        var gbx = await gbxService.ParseGbxAsync(data.Stream, headerOnly);
+        var gbx = await gbxService.ParseGbxAsync(data.Stream, headerOnly, logger);
 
         if (gbx is null)
         {

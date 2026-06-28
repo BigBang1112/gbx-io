@@ -1,7 +1,9 @@
-﻿using GBX.NET;
-using GBX.NET.Engines.Plug;
+﻿using BigBang1112.GbxTools.IO.Data;
+using GBX.NET;
+using GBX.NET.Engines.Game;
 using GBX.NET.Engines.GameData;
-using BigBang1112.GbxTools.IO.Data;
+using GBX.NET.Engines.Plug;
+using GBX.NET.Managers;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -10,6 +12,10 @@ public sealed class ExtractMeshIoTool(string endpoint, IServiceProvider provider
 {
 	public override string Name => "Extract mesh (OBJ+MTL)";
 
+	public override IEnumerable<string> InputExtensions => new string[] { "Item.Gbx", "Block.Gbx", "ObjectInfo.Gbx" }
+		.Concat(ClassManager.GetFileExtensions(CPlugSolid.Id))
+		.Concat(ClassManager.GetFileExtensions(CPlugSolid2Model.Id))
+		.Concat(ClassManager.GetFileExtensions(CPlugPrefab.Id));
     public override IEnumerable<string> OutputExtensions => ["obj", "mtl"];
 
 	public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)

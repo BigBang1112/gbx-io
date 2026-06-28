@@ -40,12 +40,18 @@ h1 {
     align-items: center;
     gap: clamp(0.5rem, 1.2cqw, 1.25rem);
     width: clamp(70px, 15cqw, 150px);
+    height: clamp(70px, 17cqw, 190px);
 }
 
     .gbx-item img {
         width: clamp(56px, 15cqw, 128px);
         height: clamp(56px, 15cqw, 128px);
     }
+
+[data-theme="light"] .gbx-item img:not(.gbx),
+.reu-theme-light .gbx-item img:not(.gbx) {
+    filter: invert(1);
+}
 
 .arrow {
     width: clamp(20px, 8cqw, 200px);
@@ -54,13 +60,14 @@ h1 {
 .status {
     display: flex;
     align-items: center;
-    font-size: clamp(100%, 13cqw, 150%);
+    text-align: center;
+    font-size: clamp(100%, 3cqw, 150%);
     height: 64px;
 }
 
 .extensions {
     text-align: center;
-    font-size: clamp(0.65rem, 3cqw, 1.5rem);
+    font-size: clamp(0.65rem, 2cqw, 1.5rem);
 }
 
 [data-theme="light"] .arrow,
@@ -69,7 +76,15 @@ h1 {
 }
 
 .extras {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     position: absolute;
-    bottom: 0.5rem;
     left: 1rem;
+    bottom: 1rem;
 }
+
+    .extras .error-message {
+        margin-left: 0.5rem;
+        color: var(--color-red);
+    }

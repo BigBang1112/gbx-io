@@ -1,7 +1,8 @@
-﻿using GBX.NET;
+﻿using BigBang1112.GbxTools.IO.Data;
+using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.Inputs;
-using BigBang1112.GbxTools.IO.Data;
+using GBX.NET.Managers;
 using System.Text;
 
 namespace BigBang1112.GbxTools.IO.Tools;
@@ -10,6 +11,10 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx, IEnumerable<TextData>>(endpoint, provider)
 {
     public override string Name => "Extract inputs";
+
+    public override IEnumerable<string> InputExtensions => ClassManager.GetFileExtensions(CGameCtnReplayRecord.Id)
+        .Concat(ClassManager.GetFileExtensions(CGameCtnGhost.Id))
+        .Concat(ClassManager.GetFileExtensions(CGameCtnMediaClip.Id));
 
     public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
 	{
