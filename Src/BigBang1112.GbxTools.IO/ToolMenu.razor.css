@@ -1,10 +1,12 @@
 .tool-menu {
-    width: 350px;
+    width: 340px;
     display: flex;
     flex-direction: column;
     gap: 5px;
     overflow-y: auto;
     padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
 }
 
     .tool-menu:not(.tool-menu-loading) ::deep .reu-button {
@@ -35,5 +37,27 @@
 
     100% {
         filter: blur(0);
+    }
+}
+
+@media (max-width: 1000px) {
+    .tool-menu {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 8px;
+        padding: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+        .tool-menu ::deep .reu-button {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+    .tool-menu-loading ::deep div.loader {
+        top: calc(50% - 35px);
+        left: calc(50% - 35px);
     }
 }

@@ -34,11 +34,11 @@
                         }
                     </div>
                 </div>
-                <img src="@GetIconPath("arrow_right.svg")" />
+                <img src="@GetIconPath("arrow_right.svg")" class="arrow" />
                 <ReuUploadButton CssClass="upload-button" OnUpload="ImportAsync" Accept="@GetAccept(ioTool)">
                     <img src="@GetIconPath("upload.svg")" alt="Upload" />
                 </ReuUploadButton>
-                <img src="@GetIconPath("arrow_right.svg")" />
+                <img src="@GetIconPath("arrow_right.svg")" class="arrow" />
                 <div class="gbx-item">
                     <img src="@GetFileIconPath(ioTool.OutputExtensions)" alt="Gbx" width="128" height="128" />
                     <div class="extensions">
@@ -49,16 +49,22 @@
                     </div>
                 </div>
             </div>
+            <div class="drag-drop-note">...or drag & drop anywhere</div>
             <div class="status">
-                Some weird progress idk
+                @Message
+            </div>
+            <div class="extras">
+                extras
             </div>
         }
     </div>
 </ReuMain>
 
 @code {
-        [Parameter, EditorRequired]
-        public string? Tool { get; set; }
+    [Parameter, EditorRequired]
+    public string? Tool { get; set; }
+
+    public string Message { get; set; } = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -113,6 +119,7 @@
     async Task OnSelectedToolChanged(IoTool tool)
     {
         Tool = tool.Endpoint;
+        Message = string.Empty;
 
         await JS.InvokeVoidAsync("history.pushState", null, "", $"/{tool.Endpoint}");
     }
@@ -130,12 +137,18 @@
             return;
         }
 
+        tool.Progress = new Progress<string>(msg =>
+        {
+            Message = msg;
+            StateHasChanged();
+        });
+
         if (args.Type == "application/zip")
         {
             await using var msInput = new MemoryStream(args.Data);
             using var zipInput = new ZipArchive(msInput, ZipArchiveMode.Read);
 
-            await using var msOutput = new MemoryStream();
+            var msOutput = new MemoryStream();
             using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create))
             {
                 foreach (var entry in zipInput.Entries)
@@ -185,6 +198,7 @@
 
         if (output is IData data)
         {
+            data.Stream.Position = 0;
             yield return data;
         }
 

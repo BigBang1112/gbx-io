@@ -1,19 +1,26 @@
 ﻿.io-upload-area {
     display: flex;
     flex-direction: column;
-    gap: 5rem;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 2cqw, 2rem);
+    width: 100%;
     overflow: auto;
+    position: relative;
+    padding: 2rem;
+    box-sizing: border-box;
+    container-type: size;
 }
 
 h1 {
-    font-size: 300%;
-    margin: 0;
+    font-size: clamp(150%, 5cqw, 300%);
+    margin-top: 0;
     text-align: center;
 }
 
 ::deep .upload-button {
-    width: 200px;
-    height: 175px;
+    width: clamp(70px, 18cqw, 200px);
+    height: clamp(70px, 17cqw, 190px);
 }
 
 ::deep .upload-button img {
@@ -22,26 +29,47 @@ h1 {
 
 .input-output {
     display: flex;
-    gap: 1rem;
-    height: 200px;
+    gap: clamp(0.1rem, 1cqw, 1rem);
+    align-items: center;
+    height: auto;
 }
 
 .gbx-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
-    font-size: 150%;
-    width: 150px;
+    gap: clamp(0.5rem, 1.2cqw, 1.25rem);
+    width: clamp(70px, 15cqw, 150px);
+}
+
+    .gbx-item img {
+        width: clamp(56px, 15cqw, 128px);
+        height: clamp(56px, 15cqw, 128px);
+    }
+
+.arrow {
+    width: clamp(20px, 8cqw, 200px);
 }
 
 .status {
     display: flex;
     align-items: center;
-    font-size: 150%;
+    font-size: clamp(100%, 13cqw, 150%);
     height: 64px;
 }
 
 .extensions {
     text-align: center;
+    font-size: clamp(0.65rem, 3cqw, 1.5rem);
+}
+
+[data-theme="light"] .arrow,
+.reu-theme-light .arrow {
+    filter: invert(1);
+}
+
+.extras {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 1rem;
 }

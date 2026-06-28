@@ -4,7 +4,7 @@ body {
 }
 
 .reu-button {
-    width: auto;
+    padding: 10px 20px !important;
 }
 
 .reu-main {
@@ -13,9 +13,9 @@ body {
     overflow: auto;
 }
 
-.io-upload-area {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+@media (max-width: 1000px) {
+    .reu-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
 }
