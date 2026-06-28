@@ -85,6 +85,16 @@ public sealed class ToolService
             return await tool.ProcessAsync(new GbxData(data.FileName, data.Stream), cancellationToken);
         }
 
+        if (inputType == typeof(PakData))
+        {
+            return await tool.ProcessAsync(new PakData(data.FileName, data.Stream), cancellationToken);
+        }
+
+        if (inputType == typeof(ZipData))
+        {
+            return await tool.ProcessAsync(new ZipData(data.FileName, data.Stream), cancellationToken);
+        }
+
         if (inputType == typeof(TextData))
         {
             return await tool.ProcessAsync(await data.ToTextDataAsync(cancellationToken: cancellationToken), cancellationToken);

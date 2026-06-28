@@ -11,7 +11,7 @@ public sealed class DecompressGbxIoTool(string endpoint, IServiceProvider provid
 
     public override async Task<GbxData> ProcessAsync(GbxData input, CancellationToken cancellationToken)
     {
-        await using var outputStream = new MemoryStream((int)input.Stream.Length);
+        var outputStream = new MemoryStream((int)input.Stream.Length);
 
         await Gbx.DecompressAsync(input.Stream, outputStream, cancellationToken);
 

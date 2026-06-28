@@ -19,7 +19,7 @@ public sealed class ExtractThumbnailIoTool(string endpoint, IServiceProvider pro
     {
         if (input is Gbx<CGameCtnChallenge> gbxMap)
         {
-            await using var ms = new MemoryStream();
+            var ms = new MemoryStream();
 
             if (gbxMap.Node.ExportThumbnail(ms, SkiaSharp.SKEncodedImageFormat.Jpeg, 100))
             {
@@ -31,7 +31,7 @@ public sealed class ExtractThumbnailIoTool(string endpoint, IServiceProvider pro
 
         if (input.Node is CGameCtnCollector collector)
         {
-            await using var ms = new MemoryStream();
+            var ms = new MemoryStream();
 
             if (collector.ExportIcon(ms))
             {

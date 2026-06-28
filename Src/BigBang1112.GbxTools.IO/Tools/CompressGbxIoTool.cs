@@ -11,7 +11,7 @@ public sealed class CompressGbxIoTool(string endpoint, IServiceProvider provider
 
     public override async Task<GbxData> ProcessAsync(GbxData input, CancellationToken cancellationToken)
     {
-        await using var outputStream = new MemoryStream((int)input.Stream.Length);
+        var outputStream = new MemoryStream((int)input.Stream.Length);
 
         await Gbx.CompressAsync(input.Stream, outputStream, cancellationToken);
 

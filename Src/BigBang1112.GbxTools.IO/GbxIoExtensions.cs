@@ -11,11 +11,11 @@ public static class GbxIoExtensions
         services.AddScoped<GbxService>();
         services.AddScoped<ToolService>();
 
-        services.AddTool<CompressGbxIoTool>("optimize-gbx");
+        services.AddTool<CompressGbxIoTool>("compress-gbx");
         services.AddTool<DecompressGbxIoTool>("decompress-gbx");
         services.AddTool<ExtractMapFromReplayIoTool>("extract-map-from-replay");
         services.AddTool<ExtractThumbnailIoTool>("extract-thumbnail");
-        services.AddTool<OptimizeEmbeddedItemsIoTool>("optimize-embedded-items");
+        services.AddTool<CompressEmbeddedItemsIoTool>("compress-embedded-items");
         services.AddTool<ExtractEmbeddedItemsIoTool>("extract-embedded-items");
         services.AddTool<ExtractGhostsIoTool>("extract-ghosts");
         services.AddTool<ExtractMeshIoTool>("extract-mesh");
@@ -23,9 +23,9 @@ public static class GbxIoExtensions
         services.AddTool<ExtractInputsTmiIoTool>("extract-inputs-tmi");
         services.AddTool<ChangeToOldWoodPhysicsIoTool>("change-to-old-wood-physics");
         services.AddTool<ValidateWithoutLightmapsIoTool>("validate-without-lightmaps");
+        services.AddTool<PatchTM2StadiumBugfinishIoTool>("patch-tm2-stadium-bugfinish");
         services.AddTool<GbxToJsonIoTool>("gbx-to-json");
         services.AddTool<PakToZipTool>("pak-to-zip");
-        services.AddTool<PakToZipVsk5Tool>("pak-to-zip-vsk5");
 
         return services;
     }
