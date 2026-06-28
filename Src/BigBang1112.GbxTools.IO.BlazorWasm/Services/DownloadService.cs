@@ -1,7 +1,7 @@
 ﻿using BigBang1112.GbxTools.IO.Services;
 using Microsoft.JSInterop;
 
-namespace BigBang1112.GbxTools.IO.BlazorWebApp.Client.Services;
+namespace BigBang1112.GbxTools.IO.BlazorWasm.Services;
 
 public sealed class DownloadService(IJSRuntime js) : IDownloadService
 {

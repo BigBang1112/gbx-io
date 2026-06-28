@@ -10,6 +10,13 @@
     <base href="/" />
 
     <script src="_content/Reuniverse.Razor/reuniverse.theme.js"></script>
+    <script>
+        window.gbxIo = {
+            scrollToolMenuToActive: function (behavior = 'smooth') {
+                document.querySelector('.tool-menu button.active,.tool-menu a.active')?.scrollIntoView({ behavior: behavior, block: 'center', inline: 'center' });
+            }
+        };
+    </script>
 
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
@@ -63,6 +70,19 @@
         });
     </script>
     <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
+    <script>
+        window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
+            const url = URL.createObjectURL(blob);
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+            URL.revokeObjectURL(url);
+        }
+    </script>
     <script src="_content/Reuniverse.Razor/reuniverse.js" defer></script>
 </body>
 
