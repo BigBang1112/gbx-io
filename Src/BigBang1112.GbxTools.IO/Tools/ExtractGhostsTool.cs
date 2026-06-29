@@ -1,6 +1,7 @@
 ﻿using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.Managers;
+using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -13,7 +14,7 @@ public sealed class ExtractGhostsTool(string endpoint, IServiceProvider provider
         .Concat(ClassManager.GetFileExtensions(CGameCtnMediaClip.Id))
         .Concat(ClassManager.GetFileExtensions(CGameCtnChallenge.Id));
 
-    public override Task<IEnumerable<Gbx<CGameCtnGhost>>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
+    public override Task<IEnumerable<Gbx<CGameCtnGhost>>> ProcessAsync(Gbx input, ILogger logger, CancellationToken cancellationToken)
     {
         var fileName = Path.GetFileName(input.FilePath);
 
@@ -32,9 +33,13 @@ public sealed class ExtractGhostsTool(string endpoint, IServiceProvider provider
                     .Concat(challenge.Node.ClipGroupInGame?.Clips.SelectMany(x => x.Clip.GetGhosts()) ?? [])
                     .Concat(challenge.Node.ClipGroupEndRace?.Clips.SelectMany(x => x.Clip.GetGhosts()) ?? [])
                     .Concat(challenge.Node.ClipAmbiance?.GetGhosts() ?? []);
+                if (challenge.Node.ChallengeParameters?.RaceValidateGhost is not null)
+                {
+                    ghosts = ghosts.Prepend(challenge.Node.ChallengeParameters.RaceValidateGhost);
+                }
                 break;
             default:
-                throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Challenge/Map.Gbx is supported.");
+                throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Challenge/Map.Gbx are supported.");
         }
 
         return Task.FromResult(ghosts.Select((ghost, i) =>

@@ -3,6 +3,7 @@ using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.Inputs;
 using GBX.NET.Managers;
+using Microsoft.Extensions.Logging;
 using System.Text;
 
 namespace BigBang1112.GbxTools.IO.Tools;
@@ -16,7 +17,7 @@ public class ExtractInputsTool(string endpoint, IServiceProvider provider)
         .Concat(ClassManager.GetFileExtensions(CGameCtnGhost.Id))
         .Concat(ClassManager.GetFileExtensions(CGameCtnMediaClip.Id));
 
-    public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
+    public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, ILogger logger, CancellationToken cancellationToken)
 	{
         var fileName = Path.GetFileName(input.FilePath);
 
@@ -38,7 +39,7 @@ public class ExtractInputsTool(string endpoint, IServiceProvider provider)
                 ghostInputs = clip.Node.GetGhosts().SelectMany(GetGhostInputs);
                 break;
             default:
-                throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Ghost.Gbx is supported.");
+                throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Ghost.Gbx are supported.");
         }
 
         var inputFiles = new List<TextData>();

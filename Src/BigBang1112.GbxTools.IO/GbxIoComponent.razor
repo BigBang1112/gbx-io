@@ -1,5 +1,6 @@
 ﻿@using System.IO.Compression
 @using BigBang1112.GbxTools.IO.Data
+@using ByteSizeLib
 @using GBX.NET
 @using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
@@ -36,9 +37,16 @@
                     </div>
                 </div>
                 <img src="@GetIconPath("arrow_right.svg")" class="arrow" />
-                <ReuUploadButton CssClass="upload-button" OnUpload="ImportAsync" Accept="@GetAccept(ioTool)">
-                    <img src="@GetIconPath("upload.svg")" alt="Upload" />
-                </ReuUploadButton>
+                @if (cts is null)
+                {
+                    <ReuUploadButton CssClass="upload-button" OnUpload="ImportAsync" Accept="@GetAccept(ioTool)">
+                        <img src="@GetIconPath("upload.svg")" alt="Upload" />
+                    </ReuUploadButton>                    
+                }
+                else
+                {
+                    <ReuButton OnClick="() => cts?.Cancel()" Variant="ReuButtonVariant.Red" CssClass="upload-button">Cancel</ReuButton>
+                }
                 <img src="@GetIconPath("arrow_right.svg")" class="arrow" />
                 <div class="gbx-item">
                     <img src="@GetFileIconPath(ioTool.OutputExtensions)" alt="Gbx" class="@(ioTool.OutputExtensions.Any(x => x.EndsWith("gbx", StringComparison.OrdinalIgnoreCase) && !x.EndsWith("pack.gbx", StringComparison.OrdinalIgnoreCase)) ? "gbx" : "")" width="128" height="128" />
@@ -70,13 +78,14 @@
 <ReuModal @bind-IsOpen="logsOpen" Title="@($"Logs{(ioTool is null ? null : $" - {ioTool.Name}")}")" MaxWidth="100%" Height="100%">
     @if (ioTool is not null)
     {
-        <ReuLogs Provider="GetOrCreateProvider(ioTool.Endpoint)" style="height: 100%; box-sizing: border-box;" MaxEntries="99999"></ReuLogs>                
+        <ReuLogs Provider="GetOrCreateProvider(ioTool.Endpoint)" style="height: 100%; box-sizing: border-box;"></ReuLogs>                
     }
 </ReuModal>
 
     @code {
     private bool logsOpen = false;
     private Dictionary<string, ReuLoggerProvider> logProviders = [];
+    private CancellationTokenSource? cts;
 
     [Parameter, EditorRequired]
     public string? Tool { get; set; }
@@ -166,32 +175,47 @@
             return;
         }
 
-        tool.Progress = new Progress<string>(msg =>
+        tool.Progress = new Progress<string>(async msg =>
         {
+            if (cts is null or { IsCancellationRequested: true })
+            {
+                return;
+            }
+
             Message = msg;
             StateHasChanged();
+            await Task.Yield();
         });
 
         var logger = GetOrCreateProvider(tool.Endpoint).CreateLogger(tool.Endpoint);
+        logger.LogInformation("Received file {FileName} ({FileSize}) for tool {ToolName}", args.FileName, ByteSize.FromBytes(args.Data.Length), tool.Name);
+
+        cts = new CancellationTokenSource();
+
+        var cancellationToken = cts.Token;
 
         try
         {
             if (args.Type == "application/zip")
             {
+                logger.LogInformation("Received ZIP file, extracting and processing each entry for tool {ToolName}", tool.Name);
+
                 await using var msInput = new MemoryStream(args.Data);
                 using var zipInput = new ZipArchive(msInput, ZipArchiveMode.Read);
 
                 var msOutput = new MemoryStream();
-                using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create))
+                using (var zipOutput = new ZipArchive(msOutput, ZipArchiveMode.Create, leaveOpen: true))
                 {
                     foreach (var entry in zipInput.Entries)
                     {
+                        logger.LogInformation("Processing entry {EntryName} from ZIP file for tool {ToolName}", entry.FullName, tool.Name);
+                        
                         await using var entryStream = entry.Open();
                         var binData = new BinData(args.FileName, entryStream, args.Type);
 
                         try
                         {
-                            var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, CancellationToken.None);
+                            var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, cancellationToken);
 
                             await foreach (var fileData in ProcessOutputAsync(output))
                             {
@@ -201,7 +225,7 @@
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Error processing file {FileName}", entry.FullName);
+                            logger.LogError(ex, "Error processing entry {EntryName} from ZIP file for tool {ToolName}", entry.FullName, tool.Name);
                             ErrorMessage = ex.Message;
                         }
                     }
@@ -213,21 +237,32 @@
             }
             else
             {
+                logger.LogInformation("Processing single file {FileName} for tool {ToolName}", args.FileName, tool.Name);
+
                 var binData = new BinData(args.FileName, new MemoryStream(args.Data), args.Type);
 
-                var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, CancellationToken.None);
+                var output = await ToolService.ProcessFileAsync(tool.Endpoint, binData, logger, cancellationToken);
 
                 await foreach (var fileData in ProcessOutputAsync(output))
                 {
                     await DownloadService.DownloadAsync(fileData.FileName, fileData.Stream);
                 }
             }
+
+            logger.LogInformation("Tool {ToolName} completed successfully for {FileName}", tool.Name, args.FileName);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("Tool {ToolName} canceled for {FileName}", tool.Name, args.FileName);
+            Message = "Tool canceled.";
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing file {FileName}", args.FileName);
+            logger.LogError(ex, "Error processing file {FileName} for tool {ToolName}", args.FileName, tool.Name);
             ErrorMessage = ex.Message;
         }
+
+        cts = null;
     }
 
     async IAsyncEnumerable<IData> ProcessOutputAsync(object? output)

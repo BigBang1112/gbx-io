@@ -3,12 +3,13 @@ using GBX.NET.Components;
 using GBX.NET.Exceptions;
 using GBX.NET.PAK;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO.Compression;
-using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
+using System.IO.Compression; 
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<PakData, ZipData>(endpoint, provider)
+public class PakToZipTool(string endpoint, IServiceProvider provider)
+    : IoTool<PakData, ZipData>(endpoint, provider)
 {
     private static readonly List<(string Name, string Key)> keys = [
         ("Alpine", "3CB15D69FF8BE9C2C14D93F9379BC8EE"),
@@ -126,7 +127,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
 
     public override string Name => "Pak to ZIP";
 
-    public override async Task<ZipData> ProcessAsync(PakData input, CancellationToken cancellationToken)
+    public override async Task<ZipData> ProcessAsync(PakData input, ILogger logger, CancellationToken cancellationToken)
     {
         var name = Path.GetFileNameWithoutExtension(input.FileName) ?? throw new InvalidOperationException("Input file name is null.");
 
@@ -134,7 +135,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
         {
             try
             {
-                return await ProcessPakAsync(input, name, key, cancellationToken);
+                return await ProcessPakAsync(input, name, key, logger, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -142,10 +143,10 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
             }
         }
 
-        throw new InvalidOperationException($"No valid key found for {name}");
+        throw new InvalidOperationException($"No valid key found for {input.FileName}");
     }
 
-    private async Task<ZipData> ProcessPakAsync(PakData input, string name, string key, CancellationToken cancellationToken)
+    private async Task<ZipData> ProcessPakAsync(PakData input, string name, string key, ILogger logger, CancellationToken cancellationToken)
     {
         await using var pak = await Pak.ParseAsync(input.Stream, Convert.FromHexString(key), cancellationToken: cancellationToken);
 
@@ -163,7 +164,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
                 var fullPath = Path.Combine(file.FolderPath, fileName);
 
                 var percentage = (int)(processedFiles / (double)pak.Files.Count * 100);
-                await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} ({percentage}%)", cancellationToken);
+                await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} ({percentage}%)", logger, cancellationToken);
 
                 var entry = zip.CreateEntry(fullPath);
 
@@ -200,7 +201,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<P
             }
         }
 
-        await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} (100%)", CancellationToken.None);
+        await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} (100%)", logger, CancellationToken.None);
 
         return new ZipData($"{name}.zip", msOutput);
     }

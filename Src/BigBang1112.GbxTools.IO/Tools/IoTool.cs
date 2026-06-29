@@ -3,12 +3,13 @@ using BigBang1112.GbxTools.IO.Exceptions;
 using GBX.NET;
 using GBX.NET.Attributes;
 using GBX.NET.Managers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public abstract class IoTool<TInput, TOutput>(string endpoint, IServiceProvider provider)
-    : IoTool(endpoint, provider)
+public abstract class IoTool<TInput, TOutput>(string endpoint, IServiceProvider provider) : IoTool(endpoint, provider)
 {
     private static readonly Dictionary<Type, IEnumerable<string>> extensions = new()
     {
@@ -56,13 +57,13 @@ public abstract class IoTool<TInput, TOutput>(string endpoint, IServiceProvider 
         return ClassManager.GetFileExtensions(classAttribute.Id);
     }
 
-    public abstract Task<TOutput> ProcessAsync(TInput input, CancellationToken cancellationToken);
+    public abstract Task<TOutput> ProcessAsync(TInput input, ILogger logger, CancellationToken cancellationToken);
 
-    public override async Task<object?> ProcessAsync(object input, CancellationToken cancellationToken)
+    public override async Task<object?> ProcessAsync(object input, ILogger logger, CancellationToken cancellationToken)
     {
         if (input is TInput typedInput)
         {
-            return await ProcessAsync(typedInput, cancellationToken);
+            return await ProcessAsync(typedInput, logger, cancellationToken);
         }
 
         var type = typeof(TInput);
@@ -88,11 +89,12 @@ public abstract class IoTool(string endpoint, IServiceProvider provider)
     public abstract IEnumerable<string> InputExtensions { get; }
     public abstract IEnumerable<string> OutputExtensions { get; }
 
-    public abstract Task<object?> ProcessAsync(object input, CancellationToken cancellationToken);
+    public abstract Task<object?> ProcessAsync(object input, ILogger logger, CancellationToken cancellationToken);
 
-    public async Task ReportAsync(string message, CancellationToken cancellationToken = default)
+    public async Task ReportAsync(string message, ILogger logger, CancellationToken cancellationToken = default)
     {
-        await Task.Delay(10, cancellationToken);
+        logger.LogDebug("Reporting: {Message}", message);
         Progress?.Report(message);
+        await Task.Delay(10, cancellationToken);
     }
 }

@@ -21,6 +21,7 @@ h1 {
 ::deep .upload-button {
     width: clamp(70px, 18cqw, 200px);
     height: clamp(70px, 17cqw, 190px);
+    font-size: 200%;
 }
 
 ::deep .upload-button img {

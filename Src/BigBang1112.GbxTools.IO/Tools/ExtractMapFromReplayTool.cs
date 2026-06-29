@@ -1,5 +1,7 @@
-﻿using GBX.NET;
+﻿using BigBang1112.GbxTools.IO.Attributes;
+using GBX.NET;
 using GBX.NET.Engines.Game;
+using Microsoft.Extensions.Logging;
 using TmEssentials;
 
 namespace BigBang1112.GbxTools.IO.Tools;
@@ -9,37 +11,40 @@ public sealed class ExtractMapFromReplayTool(string endpoint, IServiceProvider p
 {
     public override string Name => "Extract map from replay";
 
-    public override Task<Gbx<CGameCtnChallenge>> ProcessAsync(Gbx<CGameCtnReplayRecord> input, CancellationToken cancellationToken)
+    public override async Task<Gbx<CGameCtnChallenge>> ProcessAsync([IgnoreExceptionsInBody] Gbx<CGameCtnReplayRecord> input, ILogger logger, CancellationToken cancellationToken)
     {
-        var map = input.Node.Challenge ?? throw new InvalidOperationException("No map found.");
+        var mapGbx = await input.Node.GetChallengeAsync(cancellationToken: cancellationToken) ?? throw new InvalidOperationException("No map found.");
+        var map = mapGbx.Node;
 
-        var extension = map.CanBeGameVersion(
+        var isManiaPlanet = map.CanBeGameVersion(
               GameVersion.MP1
             | GameVersion.MP2
             | GameVersion.MP3
             | GameVersion.TMT
             | GameVersion.MP4
-            | GameVersion.TM2020) ? ".Map.Gbx" : ".Challenge.Gbx";
+            | GameVersion.TM2020);
 
-        map.CreateChunk<CGameCtnChallenge.HeaderChunk03043003>();
-
-        if (map.KindInHeader == CGameCtnChallenge.MapKind.EndMarker)
+        if (isManiaPlanet)
         {
-            map.KindInHeader = CGameCtnChallenge.MapKind.Multi;
+            map.CreateChunk<CGameCtnChallenge.HeaderChunk03043003>();
+
+            if (map.KindInHeader == CGameCtnChallenge.MapKind.EndMarker)
+            {
+                map.KindInHeader = map.Kind;
+            }
         }
+
+        var extension = isManiaPlanet ? ".Map.Gbx" : ".Challenge.Gbx";
 
         var mapName = TextFormatter.Deformat(map.MapName);
 
-        foreach (var ch in Path.GetInvalidFileNameChars())
+        foreach (var ch in GbxPath.InvalidFileNameChars)
         {
-            mapName = mapName.Replace(ch, '_'); 
+            mapName = mapName.Replace(ch, '_');
         }
 
-        return Task.FromResult(new Gbx<CGameCtnChallenge>(map, input.Header.Basic)
-        {
-            FilePath = mapName + extension,
-            ClassIdRemapMode = input.ClassIdRemapMode,
-            PackDescVersion = input.PackDescVersion
-        });
+        mapGbx.FilePath = mapName + extension;
+
+        return mapGbx;
     }
 }

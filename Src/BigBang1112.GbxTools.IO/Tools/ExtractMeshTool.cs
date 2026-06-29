@@ -1,9 +1,9 @@
 ﻿using BigBang1112.GbxTools.IO.Data;
 using GBX.NET;
-using GBX.NET.Engines.Game;
 using GBX.NET.Engines.GameData;
 using GBX.NET.Engines.Plug;
 using GBX.NET.Managers;
+using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -18,7 +18,7 @@ public sealed class ExtractMeshTool(string endpoint, IServiceProvider provider)
 		.Concat(ClassManager.GetFileExtensions(CPlugPrefab.Id));
     public override IEnumerable<string> OutputExtensions => ["obj", "mtl"];
 
-	public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, CancellationToken cancellationToken)
+	public override Task<IEnumerable<TextData>> ProcessAsync(Gbx input, ILogger logger, CancellationToken cancellationToken)
 	{
 		var files = new List<TextData>();
 

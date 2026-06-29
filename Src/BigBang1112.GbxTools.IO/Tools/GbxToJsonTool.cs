@@ -1,6 +1,7 @@
 ﻿using GBX.NET;
 using GBX.NET.NewtonsoftJson;
 using BigBang1112.GbxTools.IO.Data;
+using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -11,7 +12,7 @@ public sealed class GbxToJsonTool(string endpoint, IServiceProvider provider)
 
     public override IEnumerable<string> OutputExtensions => ["json"];
 
-    public override Task<TextData> ProcessAsync(Gbx input, CancellationToken cancellationToken)
+    public override Task<TextData> ProcessAsync(Gbx input, ILogger logger, CancellationToken cancellationToken)
     {
         return Task.FromResult(new TextData(input.FilePath + ".json", input.ToJson(), "application/json"));
     }

@@ -16,7 +16,7 @@ public sealed class GbxService(ILogger<GbxService> logger)
         Gbx.ZLib = new ZLib();
     }
 
-    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly, ILogger? logger)
+    public async ValueTask<Gbx?> ParseGbxAsync(Stream stream, bool headerOnly, bool ignoreExceptionsInBody, ILogger? logger)
     {
         logger ??= this.logger;
 
@@ -24,7 +24,7 @@ public sealed class GbxService(ILogger<GbxService> logger)
         {
             return headerOnly
                 ? Gbx.ParseHeader(stream, new() { Logger = logger })
-                : await Gbx.ParseAsync(stream, new() { Logger = logger });
+                : await Gbx.ParseAsync(stream, new() { Logger = logger, IgnoreExceptionsInBody = ignoreExceptionsInBody });
         }
         catch (NotAGbxException)
         {

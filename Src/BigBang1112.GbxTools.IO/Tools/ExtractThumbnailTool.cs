@@ -4,7 +4,7 @@ using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.Engines.GameData;
 using GBX.NET.Imaging.SkiaSharp;
-using GBX.NET.Managers;
+using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -15,7 +15,7 @@ public sealed class ExtractThumbnailTool(string endpoint, IServiceProvider provi
 
     public override IEnumerable<string> OutputExtensions => ["jpg", "png"];
 
-    public override async Task<BinData?> ProcessAsync([HeaderOnly] Gbx input, CancellationToken cancellationToken)
+    public override async Task<BinData?> ProcessAsync([HeaderOnly] Gbx input, ILogger logger, CancellationToken cancellationToken)
     {
         if (input is Gbx<CGameCtnChallenge> gbxMap)
         {

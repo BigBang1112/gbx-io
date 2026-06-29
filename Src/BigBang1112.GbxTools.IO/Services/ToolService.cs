@@ -51,11 +51,14 @@ public sealed class ToolService
         var inputType = genericArguments[0];
         var outputType = genericArguments[1]; // probably not needed, output can be type checked
 
-        var headerOnly = Attribute.IsDefined(toolType.GetMethods()
+        var gbxParameter = toolType.GetMethods()
             .First(m => m.Name == nameof(IoTool.ProcessAsync))
-            .GetParameters()[0], typeof(HeaderOnlyAttribute));
+            .GetParameters()[0];
 
-        return await ProcessToolAsync(tool, data, inputType, headerOnly, logger, cancellationToken);
+        var headerOnly = Attribute.IsDefined(gbxParameter, typeof(HeaderOnlyAttribute));
+        var ignoreExceptionsInBody = Attribute.IsDefined(gbxParameter, typeof(IgnoreExceptionsInBodyAttribute));
+
+        return await ProcessToolAsync(tool, data, inputType, headerOnly, ignoreExceptionsInBody, logger, cancellationToken);
     }
 
     internal static Type? GetIoToolBaseType(Type toolType)
@@ -75,41 +78,46 @@ public sealed class ToolService
         return baseType;
     }
 
-    private async Task<object?> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, ILogger logger, CancellationToken cancellationToken)
+    private async Task<object?> ProcessToolAsync(IoTool tool, BinData data, Type inputType, bool headerOnly, bool ignoreExceptionsInBody, ILogger logger, CancellationToken cancellationToken)
     {
         if (inputType == typeof(BinData))
         {
-            return await tool.ProcessAsync(data, cancellationToken);
+            return await tool.ProcessAsync(data, logger, cancellationToken);
         }
 
         if (inputType == typeof(GbxData))
         {
-            return await tool.ProcessAsync(new GbxData(data.FileName, data.Stream), cancellationToken);
+            return await tool.ProcessAsync(new GbxData(data.FileName, data.Stream), logger, cancellationToken);
         }
 
         if (inputType == typeof(PakData))
         {
-            return await tool.ProcessAsync(new PakData(data.FileName, data.Stream), cancellationToken);
+            return await tool.ProcessAsync(new PakData(data.FileName, data.Stream), logger, cancellationToken);
         }
 
         if (inputType == typeof(ZipData))
         {
-            return await tool.ProcessAsync(new ZipData(data.FileName, data.Stream), cancellationToken);
+            return await tool.ProcessAsync(new ZipData(data.FileName, data.Stream), logger, cancellationToken);
         }
 
         if (inputType == typeof(TextData))
         {
-            return await tool.ProcessAsync(await data.ToTextDataAsync(cancellationToken: cancellationToken), cancellationToken);
+            return await tool.ProcessAsync(await data.ToTextDataAsync(cancellationToken: cancellationToken), logger, cancellationToken);
         }
 
-        var gbx = await gbxService.ParseGbxAsync(data.Stream, headerOnly, logger);
+        var gbx = await gbxService.ParseGbxAsync(data.Stream, headerOnly, ignoreExceptionsInBody, logger);
 
         if (gbx is null)
         {
             return null;
         }
 
+        if (gbx.Body.Exception is not null)
+        {
+            logger.LogWarning(gbx.Body.Exception, "Gbx has exceptions in body, but will be processed anyway.");
+        }
+
         gbx.FilePath = data.FileName;
-        return await tool.ProcessAsync(gbx, cancellationToken);
+        return await tool.ProcessAsync(gbx, logger, cancellationToken);
     }
 }

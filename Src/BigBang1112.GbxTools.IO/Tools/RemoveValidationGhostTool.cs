@@ -4,19 +4,15 @@ using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
-public sealed class ValidateWithoutLightmapsTool(string endpoint, IServiceProvider provider)
+public sealed class RemoveValidationGhostTool(string endpoint, IServiceProvider provider)
     : IoTool<Gbx<CGameCtnChallenge>, Gbx<CGameCtnChallenge>>(endpoint, provider)
 {
-    public override string Name => "Validate without lightmaps";
-
-    public override IEnumerable<string> InputExtensions => ["Map.Gbx"];
-    public override IEnumerable<string> OutputExtensions => ["Map.Gbx"];
+    public override string Name => "Remove validation ghost";
 
     public override Task<Gbx<CGameCtnChallenge>> ProcessAsync(Gbx<CGameCtnChallenge> input, ILogger logger, CancellationToken cancellationToken)
     {
         var output = input;
-        output.Node.HasLightmaps = false;
-        output.Node.LightmapFrames = [new() { Version = 6 }];
+        output.Node.ChallengeParameters?.RaceValidateGhost = null;
         return Task.FromResult(output);
     }
 }

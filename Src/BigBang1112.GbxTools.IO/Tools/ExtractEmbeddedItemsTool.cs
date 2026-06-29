@@ -1,6 +1,7 @@
 ﻿using GBX.NET;
 using GBX.NET.Engines.Game;
 using BigBang1112.GbxTools.IO.Data;
+using Microsoft.Extensions.Logging;
 
 namespace BigBang1112.GbxTools.IO.Tools;
 
@@ -9,7 +10,7 @@ public sealed class ExtractEmbeddedItemsTool(string endpoint, IServiceProvider p
 {
     public override string Name => "Extract embedded items";
 
-    public override Task<ZipData> ProcessAsync(Gbx<CGameCtnChallenge> input, CancellationToken cancellationToken)
+    public override Task<ZipData> ProcessAsync(Gbx<CGameCtnChallenge> input, ILogger logger, CancellationToken cancellationToken)
     {
         if (input.Node.EmbeddedZipData is null or { Length: 0 })
         {
