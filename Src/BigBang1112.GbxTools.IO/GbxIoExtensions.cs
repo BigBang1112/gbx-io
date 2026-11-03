@@ -22,6 +22,7 @@ public static class GbxIoExtensions
         services.AddTool<ExtractInputsTool>("extract-inputs");
         services.AddTool<ExtractInputsTmiTool>("extract-inputs-tmi");
         services.AddTool<RemoveValidationGhostTool>("remove-validation-ghost");
+        services.AddTool<RemoveIpsFromReplaysTool>("remove-ips-from-replays");
         services.AddTool<ChangeToOldWoodPhysicsTool>("change-to-old-wood-physics");
         services.AddTool<ValidateWithoutLightmapsTool>("validate-without-lightmaps");
         services.AddTool<PatchTM2StadiumBugfinishTool>("patch-tm2-stadium-bugfinish");
