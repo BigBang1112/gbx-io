@@ -17,33 +17,16 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
 	{
         var fileName = Path.GetFileName(input.FilePath);
 
-        IEnumerable<IInput> replayInputs;
-        IEnumerable<IEnumerable<IInput>> ghostInputs;
-
-        switch (input)
+        // TM1.0 replay inputs are in the validation ghost since GBX.NET 2.5, which GetGhosts() already returns
+        var ghostInputs = input switch
         {
-            case Gbx<CGameCtnGhost> ghost:
-                replayInputs = [];
-                ghostInputs = GetGhostInputs(ghost);
-                break;
-            case Gbx<CGameCtnReplayRecord> replay:
-                replayInputs = replay.Node.Inputs?.AsEnumerable() ?? [];
-                ghostInputs = replay.Node.GetGhosts().SelectMany(GetGhostInputs);
-                break;
-            case Gbx<CGameCtnMediaClip> clip:
-                replayInputs = [];
-                ghostInputs = clip.Node.GetGhosts().SelectMany(GetGhostInputs);
-                break;
-            default:
-                throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Ghost.Gbx is supported.");
-        }
+            Gbx<CGameCtnGhost> ghost => GetGhostInputs(ghost),
+            Gbx<CGameCtnReplayRecord> replay => replay.Node.GetGhosts().SelectMany(GetGhostInputs),
+            Gbx<CGameCtnMediaClip> clip => clip.Node.GetGhosts().SelectMany(GetGhostInputs),
+            _ => throw new InvalidOperationException("Only Replay.Gbx, Clip.Gbx, and Ghost.Gbx is supported."),
+        };
 
         var inputFiles = new List<TextData>();
-
-        if (replayInputs.Any())
-        {
-            inputFiles.Add(new TextData(Path.GetFileNameWithoutExtension(fileName) + ".txt", CreateInputText(replayInputs), Format));
-        }
 
         var i = 0;
 
@@ -57,7 +40,7 @@ public class ExtractInputsIoTool(string endpoint, IServiceProvider provider)
 
     private static IEnumerable<IEnumerable<IInput>> GetGhostInputs(CGameCtnGhost ghost)
     {
-        IEnumerable<IEnumerable<IInput>> ghostInputs = [ghost.Inputs];
+        IEnumerable<IEnumerable<IInput>> ghostInputs = [ghost.GetSimulationInputs()];
 
         if (ghost.PlayerInputs is not null)
         {
