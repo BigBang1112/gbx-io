@@ -76,7 +76,7 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<B
             foreach (var file in pak.Files.Values)
             {
                 var fileName = hashes.GetValueOrDefault(file.Name)?.Replace('\\', Path.DirectorySeparatorChar) ?? file.Name;
-                var fullPath = Path.Combine(file.FolderPath, fileName);
+                var fullPath = Path.Combine(file.FolderPath, fileName).Replace('\\', '/');
 
                 var percentage = (int)(processedFiles / (double)pak.Files.Count * 100);
                 await ReportAsync($"Extracted files: {extractedFiles}/{processedFiles}/{pak.Files.Count} ({percentage}%)", cancellationToken);
@@ -152,7 +152,10 @@ public class PakToZipTool(string endpoint, IServiceProvider provider) : IoTool<B
             var hash = line[..firstSpace];
             var path = line[(firstSpace + 1)..];
 
-            hashes[hash] = path;
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                hashes[hash] = path;
+            }
         }
 
         return hashes;
