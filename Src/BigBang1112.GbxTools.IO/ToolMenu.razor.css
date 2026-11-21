@@ -16,7 +16,7 @@
 .tool-menu-loading {
     pointer-events: none;
     position: relative;
-    background: var(--color-footer-bg);
+    background: var(--color-surface-secondary);
 }
 
     .tool-menu-loading ::deep .reu-button {

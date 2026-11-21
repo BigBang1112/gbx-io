@@ -4,4 +4,7 @@
   <Project Path="Src/BigBang1112.GbxTools.IO.BlazorWebApp/BigBang1112.GbxTools.IO.BlazorWebApp.csproj" Id="21f5d82e-fcc6-4ac8-b054-a91967df8c0c" />
   <Project Path="Src/BigBang1112.GbxTools.IO.BlazorWebApp.Client/BigBang1112.GbxTools.IO.BlazorWebApp.Client.csproj" Id="61e618ab-9b44-4303-a43d-4b7aa1aeaea8" />
   <Project Path="Src/BigBang1112.GbxTools.IO.Photino/BigBang1112.GbxTools.IO.Photino.csproj" Id="b2c6d3fd-beb3-45ff-8800-1bda8678aa25" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/BigBang1112.GbxTools.IO.Tests/BigBang1112.GbxTools.IO.Tests.csproj" />
+  </Folder>
 </Solution>

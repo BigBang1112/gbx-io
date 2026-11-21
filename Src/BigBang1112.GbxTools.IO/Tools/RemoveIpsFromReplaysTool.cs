@@ -40,7 +40,7 @@ public sealed class RemoveIpsFromReplaysTool(string endpoint, IServiceProvider p
         return new GbxData(input.FileName, outputStream);
     }
 
-    private static int ClearIps(Span<byte> data)
+    internal static int ClearIps(Span<byte> data)
     {
         ReadOnlySpan<int> patternInts = [0x03092023, 0x534B4950, 47, 3, 0];
         var pattern = MemoryMarshal.AsBytes(patternInts);

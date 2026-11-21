@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="bunit" Version="2.13.3" />
+        <PackageReference Include="TUnit" Version="1.78.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Src\BigBang1112.GbxTools.IO\BigBang1112.GbxTools.IO.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Bunit" />
+        <!-- bUnit has an obsolete class of the same name, which breaks the code TUnit generates for hooks -->
+        <Using Include="TUnit.Core.TestContext" Alias="TestContext" />
+    </ItemGroup>
+
+</Project>

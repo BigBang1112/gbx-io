@@ -15,7 +15,7 @@
 
 <PageTitle>@GetTitle()</PageTitle>
 
-<ReuUploadScreen OnUpload="ImportAsync" Accept="@GetAccept(ioTool)"></ReuUploadScreen>
+<ReuUploadScreen OnUpload="ImportAsync" Accept="@GetAccept(ioTool)" Paste="true"></ReuUploadScreen>
 <ReuMain>
     <ToolMenu SelectedToolEndpoint="@Tool" SelectedToolChanged="OnSelectedToolChanged"></ToolMenu>
     <div class="io-upload-area">
@@ -210,8 +210,15 @@
                     {
                         logger.LogInformation("Processing entry {EntryName} from ZIP file for tool {ToolName}", entry.FullName, tool.Name);
                         
-                        await using var entryStream = entry.Open();
-                        var binData = new BinData(args.FileName, entryStream, args.Type);
+                        // Entry streams cannot seek or tell their length, which the tools need
+                        var entryData = new MemoryStream();
+                        await using (var entryStream = entry.Open())
+                        {
+                            await entryStream.CopyToAsync(entryData, cancellationToken);
+                        }
+                        entryData.Position = 0;
+
+                        var binData = new BinData(entry.FullName, entryData, "application/octet-stream");
 
                         try
                         {

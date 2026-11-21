@@ -8,21 +8,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Reuniverse.Razor" Version="0.10.0" />
+        <PackageReference Include="Reuniverse.Razor" Version="0.12.0" />
         <PackageReference Include="SharpCompress" Version="0.49.1" />
         <PackageReference Include="SkiaSharp.Views.Blazor" Version="4.148.0" />
         <PackageReference Include="ByteSize" Version="2.1.2" />
-        <PackageReference Include="GBX.NET" Version="2.4.4-nightly.20260626.cd2f91d8" />
-        <PackageReference Include="GBX.NET.Imaging.SkiaSharp" Version="1.1.3" />
-        <PackageReference Include="GBX.NET.LZO" Version="2.1.5" />
-        <PackageReference Include="GBX.NET.NewtonsoftJson" Version="1.0.4" />
-        <PackageReference Include="GBX.NET.PAK" Version="2.4.4-nightly.20260626.cd2f91d8" />
-        <PackageReference Include="GBX.NET.ZLib" Version="1.1.2" />
+        <PackageReference Include="GBX.NET" Version="2.5.2" />
+        <PackageReference Include="GBX.NET.Imaging.SkiaSharp" Version="1.1.5" />
+        <PackageReference Include="GBX.NET.LZO" Version="2.1.7" />
+        <PackageReference Include="GBX.NET.NewtonsoftJson" Version="1.0.5" />
+        <PackageReference Include="GBX.NET.PAK" Version="2.4.6" />
+        <PackageReference Include="GBX.NET.ZLib" Version="1.1.4" />
     </ItemGroup>
 
 
     <ItemGroup>
         <SupportedPlatform Include="browser" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="BigBang1112.GbxTools.IO.Tests" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
